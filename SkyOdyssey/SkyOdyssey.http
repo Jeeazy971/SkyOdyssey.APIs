@@ -1,0 +1,6 @@
+@SkyOdyssey_HostAddress = http://localhost:5093
+
+GET {{SkyOdyssey_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
