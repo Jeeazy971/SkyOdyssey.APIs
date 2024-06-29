@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SkyOdyssey.Models
+﻿namespace SkyOdyssey.Models
 {
     public class Location
     {
@@ -12,8 +10,10 @@ namespace SkyOdyssey.Models
         public int MaxGuests { get; set; }
         public bool IncludesTransport { get; set; }
         public decimal Price { get; set; }
+        public string City { get; set; }
+        public string ImagePath { get; set; } // Ajouté
 
         // Navigation property
-        public ICollection<Reservation> Reservations { get; set; }
+        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

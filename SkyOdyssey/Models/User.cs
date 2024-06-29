@@ -11,6 +11,6 @@ namespace SkyOdyssey.Models
         public byte[] PasswordSalt { get; set; }
 
         // Navigation property
-        public ICollection<Reservation> Reservations { get; set; }
+        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

@@ -7,7 +7,7 @@
         public string Location { get; set; }
         public decimal PricePerNight { get; set; }
 
-        // Foreign keys
+        // Foreign key
         public int ReservationId { get; set; }
         public Reservation Reservation { get; set; }
     }

@@ -10,6 +10,7 @@ namespace SkyOdyssey.Models
         public DateTime EndDate { get; set; }
         public int NumberOfGuests { get; set; }
         public decimal TotalPrice { get; set; }
+        public string Status { get; set; } // Ajout du champ Status
 
         // Foreign keys
         public int UserId { get; set; }

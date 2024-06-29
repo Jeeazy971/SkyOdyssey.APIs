@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
-using SkyOdyssey.DTOs;
 using SkyOdyssey.Models;
-using SkyOdyssey.Repositories;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using SkyOdyssey.DTOs;
 
 namespace SkyOdyssey.Services
 {
@@ -28,6 +25,17 @@ namespace SkyOdyssey.Services
         {
             var location = await _locationRepository.GetByIdAsync(id);
             return _mapper.Map<LocationDto>(location);
+        }
+
+        public async Task CreateLocationAsync(Location location)
+        {
+            await _locationRepository.AddAsync(location);
+        }
+
+        public async Task<IEnumerable<LocationDto>> SearchLocationsAsync(string searchTerm, DateTime? availableFrom = null, DateTime? availableTo = null, decimal? maxPrice = null, int? maxGuests = null)
+        {
+            var locations = await _locationRepository.SearchLocationsAsync(searchTerm, availableFrom, availableTo, maxPrice, maxGuests);
+            return _mapper.Map<IEnumerable<LocationDto>>(locations);
         }
     }
 }

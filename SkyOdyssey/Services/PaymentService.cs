@@ -1,26 +1,23 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using SkyOdyssey.DTOs;
 using Stripe;
-using System.Threading.Tasks;
 
 namespace SkyOdyssey.Services
 {
-    public class PaymentService
+    public class PaymentService : IPaymentService
     {
-        public PaymentService(IConfiguration configuration)
+        public async Task<Charge> ProcessPaymentAsync(PaymentDto paymentDto)
         {
-            StripeConfiguration.ApiKey = configuration["Stripe:ApiKey"];
-        }
-
-        public async Task<PaymentIntent> CreatePaymentIntent(decimal amount, string currency = "eur")
-        {
-            var options = new PaymentIntentCreateOptions
+            var options = new ChargeCreateOptions
             {
-                Amount = (long)(amount * 100), // Convertir en cents
-                Currency = currency,
-                PaymentMethodTypes = new List<string> { "card" },
+                Amount = (long)(paymentDto.Amount * 100),
+                Currency = paymentDto.Currency,
+                Description = $"Paiement pour la réservation {paymentDto.ReservationId}",
+                Source = paymentDto.Token,
             };
-            var service = new PaymentIntentService();
-            return await service.CreateAsync(options);
+
+            var service = new ChargeService();
+            Charge charge = await service.CreateAsync(options);
+            return charge;
         }
     }
 }

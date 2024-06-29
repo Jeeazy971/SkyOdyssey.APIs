@@ -1,6 +1,4 @@
 ﻿using SkyOdyssey.DTOs;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SkyOdyssey.Services
 {
@@ -8,8 +6,8 @@ namespace SkyOdyssey.Services
     {
         Task<IEnumerable<ReservationDto>> GetAllReservationsAsync();
         Task<ReservationDto> GetReservationByIdAsync(int id);
-        Task<ReservationDto> CreateReservationAsync(CreateReservationDto createReservationDto);
-        Task<bool> UpdateReservationAsync(int id, UpdateReservationDto updateReservationDto);
-        Task<bool> DeleteReservationAsync(int id);
+        Task CreateReservationAsync(CreateReservationDto createReservationDto);
+        Task UpdateReservationAsync(int id, UpdateReservationDto updateReservationDto);
+        Task DeleteReservationAsync(int id);
     }
 }

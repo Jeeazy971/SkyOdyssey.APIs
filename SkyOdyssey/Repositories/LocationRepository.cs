@@ -1,34 +1,61 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkyOdyssey.Data;
 using SkyOdyssey.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace SkyOdyssey.Repositories
+public class LocationRepository : ILocationRepository
 {
-    public class LocationRepository : ILocationRepository
+    private readonly ApplicationDbContext _context;
+
+    public LocationRepository(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext _context;
+        _context = context;
+    }
 
-        public LocationRepository(ApplicationDbContext context)
+    public async Task<IEnumerable<Location>> GetAllAsync()
+    {
+        return await _context.Locations.ToListAsync();
+    }
+
+    public async Task<Location> GetByIdAsync(int id)
+    {
+        return await _context.Locations.FindAsync(id);
+    }
+
+    public async Task<IEnumerable<Location>> SearchLocationsAsync(string searchTerm, DateTime? availableFrom, DateTime? availableTo, decimal? maxPrice, int? maxGuests)
+    {
+        var query = _context.Locations.AsQueryable();
+
+        if (!string.IsNullOrEmpty(searchTerm))
         {
-            _context = context;
+            query = query.Where(l => l.Name.Contains(searchTerm) || l.City.Contains(searchTerm));
         }
 
-        public async Task<IEnumerable<Location>> GetAllAsync()
+        if (availableFrom.HasValue)
         {
-            return await _context.Locations.ToListAsync();
+            query = query.Where(l => l.AvailableFrom >= availableFrom.Value);
         }
 
-        public async Task<Location> GetByIdAsync(int id)
+        if (availableTo.HasValue)
         {
-            return await _context.Locations.FindAsync(id);
+            query = query.Where(l => l.AvailableTo <= availableTo.Value);
         }
 
-        public async Task AddAsync(Location location)
+        if (maxPrice.HasValue)
         {
-            await _context.Locations.AddAsync(location);
-            await _context.SaveChangesAsync();
+            query = query.Where(l => l.Price <= maxPrice.Value);
         }
+
+        if (maxGuests.HasValue)
+        {
+            query = query.Where(l => l.MaxGuests >= maxGuests.Value);
+        }
+
+        return await query.ToListAsync();
+    }
+
+    public async Task AddAsync(Location location)
+    {
+        await _context.Locations.AddAsync(location);
+        await _context.SaveChangesAsync();
     }
 }

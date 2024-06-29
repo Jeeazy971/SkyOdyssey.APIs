@@ -1,9 +1,9 @@
-﻿using AutoMapper;
-using SkyOdyssey.DTOs;
+﻿using SkyOdyssey.DTOs;
 using SkyOdyssey.Models;
 using SkyOdyssey.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace SkyOdyssey.Services
 {
@@ -30,32 +30,32 @@ namespace SkyOdyssey.Services
             return _mapper.Map<ReservationDto>(reservation);
         }
 
-        public async Task<ReservationDto> CreateReservationAsync(CreateReservationDto createReservationDto)
+        public async Task CreateReservationAsync(CreateReservationDto createReservationDto)
         {
             var reservation = _mapper.Map<Reservation>(createReservationDto);
             await _reservationRepository.AddAsync(reservation);
-            return _mapper.Map<ReservationDto>(reservation);
         }
 
-        public async Task<bool> UpdateReservationAsync(int id, UpdateReservationDto updateReservationDto)
+        public async Task UpdateReservationAsync(int id, UpdateReservationDto updateReservationDto)
         {
             var reservation = await _reservationRepository.GetByIdAsync(id);
             if (reservation == null)
-                return false;
+            {
+                // Handle not found error
+                return;
+            }
 
-            _mapper.Map(updateReservationDto, reservation);
+            _mapper.Map(updateReservationDto, reservation); // Update existing reservation
             await _reservationRepository.UpdateAsync(reservation);
-            return true;
         }
 
-        public async Task<bool> DeleteReservationAsync(int id)
+        public async Task DeleteReservationAsync(int id)
         {
             var reservation = await _reservationRepository.GetByIdAsync(id);
-            if (reservation == null)
-                return false;
-
-            await _reservationRepository.DeleteAsync(reservation);
-            return true;
+            if (reservation != null)
+            {
+                await _reservationRepository.DeleteAsync(reservation);
+            }
         }
     }
 }

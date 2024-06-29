@@ -8,7 +8,6 @@ using SkyOdyssey.Repositories;
 using SkyOdyssey.Data;
 using AutoMapper;
 using SkyOdyssey.Mappings;
-using StripeLocationService = SkyOdyssey.Services.LocationService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,28 +36,41 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddAuthorization();
+
+// Register AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
-builder.Services.AddScoped<ILocationService, StripeLocationService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
-builder.Services.AddHttpClient<ExternalApiService>();
-builder.Services.AddScoped<PaymentService>();
+builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<IFlightRepository, FlightRepository>();
+builder.Services.AddScoped<IFlightService, FlightService>();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Seed data
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    ApplicationDbContext.SeedData(context);
+}
 
 app.Run();

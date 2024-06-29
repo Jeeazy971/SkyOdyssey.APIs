@@ -1,4 +1,7 @@
-﻿namespace SkyOdyssey.DTOs
+﻿using System;
+using System.Collections.Generic;
+
+namespace SkyOdyssey.DTOs
 {
     public class ReservationDto
     {
@@ -7,7 +10,10 @@
         public DateTime EndDate { get; set; }
         public int NumberOfGuests { get; set; }
         public decimal TotalPrice { get; set; }
-        public UserDto User { get; set; }
-        public LocationDto Location { get; set; }
+        public int UserId { get; set; }
+        public int LocationId { get; set; }
+        public string Status { get; set; }
+        public List<FlightDto> Flights { get; set; }
+        public List<HotelDto> Hotels { get; set; }
     }
 }

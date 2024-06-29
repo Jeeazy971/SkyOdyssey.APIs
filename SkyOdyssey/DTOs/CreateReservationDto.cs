@@ -8,5 +8,7 @@
         public decimal TotalPrice { get; set; }
         public int UserId { get; set; }
         public int LocationId { get; set; }
+        public ICollection<FlightDto> Flights { get; set; }
+        public ICollection<HotelDto> Hotels { get; set; }
     }
 }

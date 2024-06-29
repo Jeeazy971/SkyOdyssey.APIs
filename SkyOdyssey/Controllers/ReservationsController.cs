@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SkyOdyssey.DTOs;
 using SkyOdyssey.Services;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SkyOdyssey.Controllers
 {
@@ -37,25 +34,27 @@ namespace SkyOdyssey.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateReservation([FromBody] CreateReservationDto createReservationDto)
         {
-            var reservation = await _reservationService.CreateReservationAsync(createReservationDto);
-            return CreatedAtAction(nameof(GetReservationById), new { id = reservation.Id }, reservation);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await _reservationService.CreateReservationAsync(createReservationDto);
+            return CreatedAtAction(nameof(GetReservationById), new { id = createReservationDto.UserId }, createReservationDto);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReservation(int id, [FromBody] UpdateReservationDto updateReservationDto)
         {
-            var success = await _reservationService.UpdateReservationAsync(id, updateReservationDto);
-            if (!success)
-                return NotFound();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await _reservationService.UpdateReservationAsync(id, updateReservationDto);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReservation(int id)
         {
-            var success = await _reservationService.DeleteReservationAsync(id);
-            if (!success)
-                return NotFound();
+            await _reservationService.DeleteReservationAsync(id);
             return NoContent();
         }
     }

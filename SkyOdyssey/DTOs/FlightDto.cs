@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace SkyOdyssey.Models
+﻿namespace SkyOdyssey.DTOs
 {
-    public class Flight
+    public class FlightDto
     {
         public int Id { get; set; }
         public string FlightNumber { get; set; }
@@ -11,8 +9,6 @@ namespace SkyOdyssey.Models
         public DateTime DepartureTime { get; set; }
         public DateTime ArrivalTime { get; set; }
         public decimal Price { get; set; }
-        public int ReservationId { get; set; }
-        public Reservation Reservation { get; set; }
-        public string Description { get; set; }
     }
 }
+
