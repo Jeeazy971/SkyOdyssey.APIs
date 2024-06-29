@@ -71,7 +71,7 @@ namespace SkyOdyssey.Data
                     return passwordSalt;
                 });
 
-            var users = userFaker.Generate(100);
+            var users = userFaker.Generate(5);
 
             var locationIds = 1;
             var locationFaker = new Faker<Location>("fr")
@@ -97,7 +97,8 @@ namespace SkyOdyssey.Data
                 .RuleFor(f => f.ArrivalAirport, f => f.Address.CityPrefix())
                 .RuleFor(f => f.DepartureTime, f => f.Date.Future())
                 .RuleFor(f => f.ArrivalTime, f => f.Date.Future())
-                .RuleFor(f => f.Price, f => f.Random.Decimal(100, 1200));
+                .RuleFor(f => f.Price, f => f.Random.Decimal(100, 1200))
+                .RuleFor(f => f.Description, f => $"Vol de {f.Address.CityPrefix()} à {f.Address.CityPrefix()} avec toutes les commodités modernes.");
 
             var flights = flightFaker.Generate(200);
 
@@ -109,7 +110,8 @@ namespace SkyOdyssey.Data
                 .RuleFor(r => r.NumberOfGuests, f => f.Random.Int(1, 10))
                 .RuleFor(r => r.TotalPrice, f => f.Random.Decimal(100, 1500))
                 .RuleFor(r => r.UserId, f => f.PickRandom(users).Id)
-                .RuleFor(r => r.LocationId, f => f.PickRandom(locations).Id);
+                .RuleFor(r => r.LocationId, f => f.PickRandom(locations).Id)
+                .RuleFor(r => r.Status, f => "Pending");
 
             var reservations = reservationFaker.Generate(200);
 
@@ -124,16 +126,18 @@ namespace SkyOdyssey.Data
             context.Flights.AddRange(flights);
             context.SaveChanges();
         }
-    }
 
-    public static class PasswordHelper
-    {
-        public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+
+
+        public static class PasswordHelper
         {
-            using (var hmac = new HMACSHA512())
+            public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
             {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+                using (var hmac = new HMACSHA512())
+                {
+                    passwordSalt = hmac.Key;
+                    passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+                }
             }
         }
     }

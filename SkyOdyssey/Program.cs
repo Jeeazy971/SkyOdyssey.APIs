@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Stripe;
-using System.Text;
+using SkyOdyssey.Data;
 using SkyOdyssey.Services;
 using SkyOdyssey.Repositories;
-using SkyOdyssey.Data;
 using AutoMapper;
 using SkyOdyssey.Mappings;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -41,6 +41,7 @@ builder.Services.AddAuthorization();
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+// Register Repositories and Services
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
@@ -70,7 +71,6 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    context.Database.Migrate();
     ApplicationDbContext.SeedData(context);
 }
 

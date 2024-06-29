@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SkyOdyssey.DTOs
+﻿namespace SkyOdyssey.DTOs
 {
     public class LocationDto
     {
@@ -14,6 +11,6 @@ namespace SkyOdyssey.DTOs
         public bool IncludesTransport { get; set; }
         public decimal Price { get; set; }
         public string City { get; set; }
-        public string ImagePath { get; set; } 
+        public string ImagePath { get; set; }
     }
 }

@@ -10,6 +10,6 @@ namespace SkyOdyssey.Services
         Task<IEnumerable<LocationDto>> GetAllLocationsAsync();
         Task<LocationDto> GetLocationByIdAsync(int id);
         Task CreateLocationAsync(Location location);
-        Task<IEnumerable<LocationDto>> SearchLocationsAsync(string searchTerm, DateTime? availableFrom = null, DateTime? availableTo = null, decimal? maxPrice = null, int? maxGuests = null);
+        Task<IEnumerable<LocationDto>> SearchLocationsAsync(string searchTerm, DateTime? availableFrom, DateTime? availableTo, decimal? maxPrice, int? maxGuests);
     }
 }

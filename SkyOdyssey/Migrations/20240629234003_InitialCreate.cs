@@ -18,7 +18,7 @@ namespace SkyOdyssey.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
                     AvailableFrom = table.Column<DateTime>(type: "TEXT", nullable: false),
                     AvailableTo = table.Column<DateTime>(type: "TEXT", nullable: false),
                     MaxGuests = table.Column<int>(type: "INTEGER", nullable: false),
@@ -91,8 +91,8 @@ namespace SkyOdyssey.Migrations
                     DepartureTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     ArrivalTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Price = table.Column<decimal>(type: "TEXT", nullable: false),
-                    ReservationId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false)
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    ReservationId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

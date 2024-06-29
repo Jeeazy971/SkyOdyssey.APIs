@@ -36,14 +36,26 @@ namespace SkyOdyssey.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateLocation([FromForm] LocationDto locationDto, [FromForm] IFormFile image)
+        public async Task<IActionResult> CreateLocation([FromForm] CreateLocationRequest request)
         {
-            if (image != null)
+            var locationDto = new LocationDto
             {
-                var imagePath = Path.Combine("uploads", $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}");
+                Name = request.Name,
+                Description = request.Description,
+                AvailableFrom = request.AvailableFrom,
+                AvailableTo = request.AvailableTo,
+                MaxGuests = request.MaxGuests,
+                IncludesTransport = request.IncludesTransport,
+                Price = request.Price,
+                City = request.City
+            };
+
+            if (request.Image != null)
+            {
+                var imagePath = Path.Combine("uploads", $"{Guid.NewGuid()}{Path.GetExtension(request.Image.FileName)}");
                 using (var stream = new FileStream(imagePath, FileMode.Create))
                 {
-                    await image.CopyToAsync(stream);
+                    await request.Image.CopyToAsync(stream);
                 }
                 locationDto.ImagePath = imagePath;
             }
