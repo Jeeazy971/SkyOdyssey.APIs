@@ -4,7 +4,7 @@
     {
         public string Token { get; set; }
         public decimal Amount { get; set; }
-        public string Currency { get; set; } = "euro";  
+        public string Currency { get; set; } = "eur";  
         public int ReservationId { get; set; }
     }
 }
