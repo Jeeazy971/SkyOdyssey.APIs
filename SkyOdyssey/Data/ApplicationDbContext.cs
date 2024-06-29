@@ -44,8 +44,6 @@ namespace SkyOdyssey.Data
                 .HasMany(r => r.Hotels)
                 .WithOne(h => h.Reservation)
                 .HasForeignKey(h => h.ReservationId);
-
-            SeedData(this);
         }
 
         public static void SeedData(ApplicationDbContext context)
@@ -73,7 +71,7 @@ namespace SkyOdyssey.Data
                     return passwordSalt;
                 });
 
-            var users = userFaker.Generate(5);
+            var users = userFaker.Generate(100);
 
             var locationIds = 1;
             var locationFaker = new Faker<Location>("fr")
