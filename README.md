@@ -278,9 +278,7 @@ L'application sera accessible à l'adresse `https://localhost:5001`.
       }
 
       searchLocations(searchTerm: string, availableFrom: string, availableTo: string, maxPrice: number, maxGuests: number): Observable<any> {
-        return this.http.get(`${this.apiUrl}/locations/search?searchTerm=${searchTerm}&availableFrom=${availableFrom}&availableTo=${availableTo}&maxPrice=${
-
-maxPrice}&maxGuests=${maxGuests}`, httpOptions);
+        return this.http.get(`${this.apiUrl}/locations/search?searchTerm=${searchTerm}&availableFrom=${availableFrom}&availableTo=${availableTo}&maxPrice=${maxPrice}&maxGuests=${maxGuests}`, httpOptions);
       }
 
       // Réservations
