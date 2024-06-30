@@ -12,14 +12,12 @@ namespace SkyOdyssey.Models
         public decimal TotalPrice { get; set; }
         public string Status { get; set; } = "Pending";
 
-        // Foreign keys
         public int UserId { get; set; }
         public User User { get; set; }
 
         public int LocationId { get; set; }
         public Location Location { get; set; }
 
-        // Navigation properties
         public ICollection<Flight> Flights { get; set; } = new List<Flight>();
         public ICollection<Hotel> Hotels { get; set; } = new List<Hotel>();
     }

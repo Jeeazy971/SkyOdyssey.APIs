@@ -18,7 +18,7 @@ namespace SkyOdyssey.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
                     AvailableFrom = table.Column<DateTime>(type: "TEXT", nullable: false),
                     AvailableTo = table.Column<DateTime>(type: "TEXT", nullable: false),
                     MaxGuests = table.Column<int>(type: "INTEGER", nullable: false),
@@ -91,12 +91,19 @@ namespace SkyOdyssey.Migrations
                     DepartureTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     ArrivalTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Price = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    ReservationId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Airline = table.Column<string>(type: "TEXT", nullable: false),
+                    ReservationId = table.Column<int>(type: "INTEGER", nullable: false),
+                    LocationId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Flights", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Flights_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Flights_Reservations_ReservationId",
                         column: x => x.ReservationId,
@@ -126,6 +133,11 @@ namespace SkyOdyssey.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Flights_LocationId",
+                table: "Flights",
+                column: "LocationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Flights_ReservationId",

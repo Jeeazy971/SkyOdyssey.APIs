@@ -34,6 +34,7 @@ namespace SkyOdyssey.Services
         {
             var reservation = _mapper.Map<Reservation>(createReservationDto);
             await _reservationRepository.AddAsync(reservation);
+            createReservationDto.Id = reservation.Id; // Mise à jour de l'ID après l'ajout
         }
 
         public async Task UpdateReservationAsync(int id, UpdateReservationDto updateReservationDto)

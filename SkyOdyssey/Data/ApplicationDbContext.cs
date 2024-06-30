@@ -35,6 +35,11 @@ namespace SkyOdyssey.Data
                 .WithOne(r => r.Location)
                 .HasForeignKey(r => r.LocationId);
 
+            modelBuilder.Entity<Location>()
+                .HasMany(l => l.Flights)
+                .WithOne(f => f.Location)
+                .HasForeignKey(f => f.LocationId);
+
             modelBuilder.Entity<Reservation>()
                 .HasMany(r => r.Flights)
                 .WithOne(f => f.Reservation)
@@ -48,7 +53,7 @@ namespace SkyOdyssey.Data
 
         public static void SeedData(ApplicationDbContext context)
         {
-            if (context.Users.Any() || context.Locations.Any() || context.Flights.Any() || context.Reservations.Any())
+            if (context.Users.Any() || context.Locations.Any() || context.Flights.Any() || context.Reservations.Any() || context.Hotels.Any())
             {
                 return;
             }
@@ -71,36 +76,23 @@ namespace SkyOdyssey.Data
                     return passwordSalt;
                 });
 
-            var users = userFaker.Generate(5);
+            var users = userFaker.Generate(10);
 
             var locationIds = 1;
             var locationFaker = new Faker<Location>("fr")
                 .RuleFor(l => l.Id, f => locationIds++)
-                .RuleFor(l => l.Name, f => $"{f.Address.City()} Hotel")
+                .RuleFor(l => l.City, f => f.Address.City())
+                .RuleFor(l => l.Name, (f, l) => $"{l.City} Hotel")
                 .RuleFor(l => l.Description, (f, l) =>
                     $"Profitez de notre hôtel {l.Name} situé au cœur de {l.City}. Nos chambres offrent un confort exceptionnel avec des équipements modernes, y compris Wi-Fi gratuit, télévision à écran plat, minibar, et plus encore. Détendez-vous dans notre spa ou profitez de notre salle de sport entièrement équipée. Idéalement situé près des attractions touristiques locales et des centres d'affaires.")
                 .RuleFor(l => l.AvailableFrom, f => f.Date.Past())
                 .RuleFor(l => l.AvailableTo, f => f.Date.Future())
                 .RuleFor(l => l.MaxGuests, f => f.Random.Int(1, 10))
                 .RuleFor(l => l.IncludesTransport, f => f.Random.Bool())
-                .RuleFor(l => l.Price, f => f.Random.Decimal(50, 3000))
-                .RuleFor(l => l.City, f => f.Address.City())
+                .RuleFor(l => l.Price, f => Math.Round(f.Random.Decimal(50, 3000), 2))
                 .RuleFor(l => l.ImagePath, f => $"uploads/{f.Random.Guid()}.jpg");
 
-            var locations = locationFaker.Generate(200);
-
-            var flightIds = 1;
-            var flightFaker = new Faker<Flight>("fr")
-                .RuleFor(f => f.Id, f => flightIds++)
-                .RuleFor(f => f.FlightNumber, f => f.Random.String2(5, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"))
-                .RuleFor(f => f.DepartureAirport, f => f.Address.CityPrefix())
-                .RuleFor(f => f.ArrivalAirport, f => f.Address.CityPrefix())
-                .RuleFor(f => f.DepartureTime, f => f.Date.Future())
-                .RuleFor(f => f.ArrivalTime, f => f.Date.Future())
-                .RuleFor(f => f.Price, f => f.Random.Decimal(100, 1200))
-                .RuleFor(f => f.Description, f => $"Vol de {f.Address.CityPrefix()} à {f.Address.CityPrefix()} avec toutes les commodités modernes.");
-
-            var flights = flightFaker.Generate(200);
+            var locations = locationFaker.Generate(100);
 
             var reservationIds = 1;
             var reservationFaker = new Faker<Reservation>("fr")
@@ -108,17 +100,29 @@ namespace SkyOdyssey.Data
                 .RuleFor(r => r.StartDate, f => f.Date.Past())
                 .RuleFor(r => r.EndDate, f => f.Date.Future())
                 .RuleFor(r => r.NumberOfGuests, f => f.Random.Int(1, 10))
-                .RuleFor(r => r.TotalPrice, f => f.Random.Decimal(100, 1500))
+                .RuleFor(r => r.TotalPrice, f => Math.Round(f.Random.Decimal(100, 1500), 2))
                 .RuleFor(r => r.UserId, f => f.PickRandom(users).Id)
                 .RuleFor(r => r.LocationId, f => f.PickRandom(locations).Id)
                 .RuleFor(r => r.Status, f => "Pending");
 
             var reservations = reservationFaker.Generate(200);
 
-            foreach (var flight in flights)
-            {
-                flight.ReservationId = reservations[new Random().Next(reservations.Count)].Id;
-            }
+            var airlines = new[] { "Air France", "British Airways", "Lufthansa", "Emirates", "Qatar Airways", "Delta Airlines", "American Airlines", "KLM", "Singapore Airlines", "Turkish Airlines" };
+
+            var flightIds = 1;
+            var flightFaker = new Faker<Flight>("fr")
+                .RuleFor(f => f.Id, f => flightIds++)
+                .RuleFor(f => f.FlightNumber, f => f.Random.String2(5, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"))
+                .RuleFor(f => f.DepartureAirport, f => $"{f.Address.City()} International Airport")
+                .RuleFor(f => f.ArrivalAirport, f => $"{f.Address.City()} International Airport")
+                .RuleFor(f => f.DepartureTime, f => f.Date.Future())
+                .RuleFor(f => f.ArrivalTime, f => f.Date.Future())
+                .RuleFor(f => f.Price, f => Math.Round(f.Random.Decimal(100, 1200), 2))
+                .RuleFor(f => f.Airline, f => f.PickRandom(airlines))
+                .RuleFor(f => f.ReservationId, f => f.PickRandom(reservations).Id)
+                .RuleFor(f => f.LocationId, f => f.PickRandom(locations).Id);
+
+            var flights = flightFaker.Generate(200);
 
             context.Users.AddRange(users);
             context.Locations.AddRange(locations);
@@ -126,18 +130,16 @@ namespace SkyOdyssey.Data
             context.Flights.AddRange(flights);
             context.SaveChanges();
         }
+    }
 
-
-
-        public static class PasswordHelper
+    public static class PasswordHelper
+    {
+        public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+            using (var hmac = new HMACSHA512())
             {
-                using (var hmac = new HMACSHA512())
-                {
-                    passwordSalt = hmac.Key;
-                    passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-                }
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
         }
     }

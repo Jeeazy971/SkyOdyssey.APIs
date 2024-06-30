@@ -1,4 +1,6 @@
 ﻿using SkyOdyssey.DTOs;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SkyOdyssey.Services
 {
@@ -6,8 +8,6 @@ namespace SkyOdyssey.Services
     {
         Task<IEnumerable<FlightDto>> GetAllFlightsAsync();
         Task<FlightDto> GetFlightByIdAsync(int id);
-        Task<FlightDto> CreateFlightAsync(FlightDto flightDto);
-        Task<bool> UpdateFlightAsync(int id, FlightDto flightDto);
-        Task<bool> DeleteFlightAsync(int id);
+        Task CreateFlightAsync(FlightDto flightDto);
     }
 }

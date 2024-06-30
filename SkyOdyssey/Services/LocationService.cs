@@ -1,6 +1,10 @@
-﻿using AutoMapper;
-using SkyOdyssey.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoMapper;
 using SkyOdyssey.DTOs;
+using SkyOdyssey.Models;
+using SkyOdyssey.Repositories;
 
 namespace SkyOdyssey.Services
 {
@@ -27,14 +31,33 @@ namespace SkyOdyssey.Services
             return _mapper.Map<LocationDto>(location);
         }
 
-        public async Task CreateLocationAsync(Location location)
+        public async Task CreateLocationAsync(LocationDto locationDto)
         {
+            var location = _mapper.Map<Location>(locationDto);
             await _locationRepository.AddAsync(location);
         }
 
-        public async Task<IEnumerable<LocationDto>> SearchLocationsAsync(string searchTerm, DateTime? availableFrom = null, DateTime? availableTo = null, decimal? maxPrice = null, int? maxGuests = null)
+        public async Task UpdateLocationAsync(int id, LocationDto locationDto)
         {
-            var locations = await _locationRepository.SearchLocationsAsync(searchTerm, availableFrom, availableTo, maxPrice, maxGuests);
+            var location = await _locationRepository.GetByIdAsync(id);
+            if (location == null)
+            {
+                // Handle not found error
+                return;
+            }
+
+            _mapper.Map(locationDto, location); // Update existing location
+            await _locationRepository.UpdateAsync(location);
+        }
+
+        public async Task DeleteLocationAsync(int id)
+        {
+            await _locationRepository.DeleteAsync(id);
+        }
+
+        public async Task<IEnumerable<LocationDto>> SearchLocationsAsync(string searchTerm, DateTime? availableFrom, DateTime? availableTo, decimal? maxPrice, int? maxGuests)
+        {
+            var locations = await _locationRepository.SearchAsync(searchTerm, availableFrom, availableTo, maxPrice, maxGuests);
             return _mapper.Map<IEnumerable<LocationDto>>(locations);
         }
     }

@@ -1,61 +1,84 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using SkyOdyssey.Data;
 using SkyOdyssey.Models;
 
-public class LocationRepository : ILocationRepository
+namespace SkyOdyssey.Repositories
 {
-    private readonly ApplicationDbContext _context;
-
-    public LocationRepository(ApplicationDbContext context)
+    public class LocationRepository : ILocationRepository
     {
-        _context = context;
-    }
+        private readonly ApplicationDbContext _context;
 
-    public async Task<IEnumerable<Location>> GetAllAsync()
-    {
-        return await _context.Locations.ToListAsync();
-    }
-
-    public async Task<Location> GetByIdAsync(int id)
-    {
-        return await _context.Locations.FindAsync(id);
-    }
-
-    public async Task<IEnumerable<Location>> SearchLocationsAsync(string searchTerm, DateTime? availableFrom, DateTime? availableTo, decimal? maxPrice, int? maxGuests)
-    {
-        var query = _context.Locations.AsQueryable();
-
-        if (!string.IsNullOrEmpty(searchTerm))
+        public LocationRepository(ApplicationDbContext context)
         {
-            query = query.Where(l => l.Name.Contains(searchTerm) || l.City.Contains(searchTerm));
+            _context = context;
         }
 
-        if (availableFrom.HasValue)
+        public async Task<IEnumerable<Location>> GetAllAsync()
         {
-            query = query.Where(l => l.AvailableFrom >= availableFrom.Value);
+            return await _context.Locations.ToListAsync();
         }
 
-        if (availableTo.HasValue)
+        public async Task<Location> GetByIdAsync(int id)
         {
-            query = query.Where(l => l.AvailableTo <= availableTo.Value);
+            return await _context.Locations.FindAsync(id);
         }
 
-        if (maxPrice.HasValue)
+        public async Task AddAsync(Location location)
         {
-            query = query.Where(l => l.Price <= maxPrice.Value);
+            await _context.Locations.AddAsync(location);
+            await _context.SaveChangesAsync();
         }
 
-        if (maxGuests.HasValue)
+        public async Task UpdateAsync(Location location)
         {
-            query = query.Where(l => l.MaxGuests >= maxGuests.Value);
+            _context.Locations.Update(location);
+            await _context.SaveChangesAsync();
         }
 
-        return await query.ToListAsync();
-    }
+        public async Task DeleteAsync(int id)
+        {
+            var location = await GetByIdAsync(id);
+            if (location != null)
+            {
+                _context.Locations.Remove(location);
+                await _context.SaveChangesAsync();
+            }
+        }
 
-    public async Task AddAsync(Location location)
-    {
-        await _context.Locations.AddAsync(location);
-        await _context.SaveChangesAsync();
+        public async Task<IEnumerable<Location>> SearchAsync(string searchTerm, DateTime? availableFrom, DateTime? availableTo, decimal? maxPrice, int? maxGuests)
+        {
+            var query = _context.Locations.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(l => l.Name.Contains(searchTerm) || l.Description.Contains(searchTerm) || l.City.Contains(searchTerm));
+            }
+
+            if (availableFrom.HasValue)
+            {
+                query = query.Where(l => l.AvailableFrom >= availableFrom.Value);
+            }
+
+            if (availableTo.HasValue)
+            {
+                query = query.Where(l => l.AvailableTo <= availableTo.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(l => l.Price <= maxPrice.Value);
+            }
+
+            if (maxGuests.HasValue)
+            {
+                query = query.Where(l => l.MaxGuests >= maxGuests.Value);
+            }
+
+            return await query.ToListAsync();
+        }
     }
 }

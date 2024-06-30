@@ -1,4 +1,6 @@
 ﻿using SkyOdyssey.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SkyOdyssey.Repositories
 {
@@ -7,7 +9,5 @@ namespace SkyOdyssey.Repositories
         Task<IEnumerable<Flight>> GetAllAsync();
         Task<Flight> GetByIdAsync(int id);
         Task AddAsync(Flight flight);
-        Task<bool> UpdateAsync(int id, Flight flight);
-        Task<bool> DeleteAsync(int id);
     }
 }

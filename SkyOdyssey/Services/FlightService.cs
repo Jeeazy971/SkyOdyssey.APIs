@@ -1,7 +1,9 @@
-﻿using AutoMapper;
-using SkyOdyssey.DTOs;
+﻿using SkyOdyssey.DTOs;
 using SkyOdyssey.Models;
 using SkyOdyssey.Repositories;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoMapper;
 
 namespace SkyOdyssey.Services
 {
@@ -28,22 +30,10 @@ namespace SkyOdyssey.Services
             return _mapper.Map<FlightDto>(flight);
         }
 
-        public async Task<FlightDto> CreateFlightAsync(FlightDto flightDto)
+        public async Task CreateFlightAsync(FlightDto flightDto)
         {
             var flight = _mapper.Map<Flight>(flightDto);
             await _flightRepository.AddAsync(flight);
-            return _mapper.Map<FlightDto>(flight);
-        }
-
-        public async Task<bool> UpdateFlightAsync(int id, FlightDto flightDto)
-        {
-            var flight = _mapper.Map<Flight>(flightDto);
-            return await _flightRepository.UpdateAsync(id, flight);
-        }
-
-        public async Task<bool> DeleteFlightAsync(int id)
-        {
-            return await _flightRepository.DeleteAsync(id);
         }
     }
 }

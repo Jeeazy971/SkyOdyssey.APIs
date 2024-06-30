@@ -39,26 +39,8 @@ namespace SkyOdyssey.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateFlight([FromBody] FlightDto flightDto)
         {
-            var createdFlight = await _flightService.CreateFlightAsync(flightDto);
-            return CreatedAtAction(nameof(GetFlightById), new { id = createdFlight.Id }, createdFlight);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateFlight(int id, [FromBody] FlightDto flightDto)
-        {
-            var updated = await _flightService.UpdateFlightAsync(id, flightDto);
-            if (!updated)
-                return NotFound();
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFlight(int id)
-        {
-            var deleted = await _flightService.DeleteFlightAsync(id);
-            if (!deleted)
-                return NotFound();
-            return NoContent();
+            await _flightService.CreateFlightAsync(flightDto);
+            return CreatedAtAction(nameof(GetFlightById), new { id = flightDto.Id }, flightDto);
         }
     }
 }

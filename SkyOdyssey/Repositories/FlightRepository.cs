@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using SkyOdyssey.Data;
 using SkyOdyssey.Models;
-using SkyOdyssey.Data;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace SkyOdyssey.Repositories
 {
@@ -15,44 +17,18 @@ namespace SkyOdyssey.Repositories
 
         public async Task<IEnumerable<Flight>> GetAllAsync()
         {
-            return await _context.Flights.ToListAsync();
+            return await _context.Flights.Include(f => f.Reservation).Include(f => f.Location).ToListAsync();
         }
 
         public async Task<Flight> GetByIdAsync(int id)
         {
-            return await _context.Flights.FindAsync(id);
+            return await _context.Flights.Include(f => f.Reservation).Include(f => f.Location).SingleOrDefaultAsync(f => f.Id == id);
         }
 
         public async Task AddAsync(Flight flight)
         {
             await _context.Flights.AddAsync(flight);
             await _context.SaveChangesAsync();
-        }
-
-        public async Task<bool> UpdateAsync(int id, Flight flight)
-        {
-            var existingFlight = await _context.Flights.FindAsync(id);
-            if (existingFlight == null) return false;
-
-            existingFlight.FlightNumber = flight.FlightNumber;
-            existingFlight.DepartureAirport = flight.DepartureAirport;
-            existingFlight.ArrivalAirport = flight.ArrivalAirport;
-            existingFlight.DepartureTime = flight.DepartureTime;
-            existingFlight.ArrivalTime = flight.ArrivalTime;
-            existingFlight.Price = flight.Price;
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var flight = await _context.Flights.FindAsync(id);
-            if (flight == null) return false;
-
-            _context.Flights.Remove(flight);
-            await _context.SaveChangesAsync();
-            return true;
         }
     }
 }

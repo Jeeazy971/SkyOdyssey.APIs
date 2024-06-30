@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SkyOdyssey.DTOs
+﻿namespace SkyOdyssey.DTOs
 {
     public class ReservationDto
     {

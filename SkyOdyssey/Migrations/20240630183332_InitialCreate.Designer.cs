@@ -11,7 +11,7 @@ using SkyOdyssey.Data;
 namespace SkyOdyssey.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240629234003_InitialCreate")]
+    [Migration("20240630183332_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,6 +25,10 @@ namespace SkyOdyssey.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Airline")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ArrivalAirport")
                         .IsRequired()
@@ -40,13 +44,12 @@ namespace SkyOdyssey.Migrations
                     b.Property<DateTime>("DepartureTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("FlightNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
@@ -55,6 +58,8 @@ namespace SkyOdyssey.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
 
                     b.HasIndex("ReservationId");
 
@@ -105,6 +110,7 @@ namespace SkyOdyssey.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ImagePath")
@@ -195,11 +201,19 @@ namespace SkyOdyssey.Migrations
 
             modelBuilder.Entity("SkyOdyssey.Models.Flight", b =>
                 {
+                    b.HasOne("SkyOdyssey.Models.Location", "Location")
+                        .WithMany("Flights")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SkyOdyssey.Models.Reservation", "Reservation")
                         .WithMany("Flights")
                         .HasForeignKey("ReservationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Location");
 
                     b.Navigation("Reservation");
                 });
@@ -236,6 +250,8 @@ namespace SkyOdyssey.Migrations
 
             modelBuilder.Entity("SkyOdyssey.Models.Location", b =>
                 {
+                    b.Navigation("Flights");
+
                     b.Navigation("Reservations");
                 });
 

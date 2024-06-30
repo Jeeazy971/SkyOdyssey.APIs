@@ -6,7 +6,6 @@
         public int LocationId { get; set; }
         public string ImagePath { get; set; }
 
-        // Navigation property
         public Location Location { get; set; }
     }
 }

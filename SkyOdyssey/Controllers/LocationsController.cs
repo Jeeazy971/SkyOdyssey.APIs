@@ -3,6 +3,9 @@ using SkyOdyssey.Services;
 using AutoMapper;
 using SkyOdyssey.DTOs;
 using SkyOdyssey.Models;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace SkyOdyssey.Controllers
 {
@@ -36,38 +39,39 @@ namespace SkyOdyssey.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateLocation([FromForm] CreateLocationRequest request)
+        public async Task<IActionResult> CreateLocation([FromForm] CreateLocationRequest createLocationRequest)
         {
-            var locationDto = new LocationDto
+            if (createLocationRequest.Image != null)
             {
-                Name = request.Name,
-                Description = request.Description,
-                AvailableFrom = request.AvailableFrom,
-                AvailableTo = request.AvailableTo,
-                MaxGuests = request.MaxGuests,
-                IncludesTransport = request.IncludesTransport,
-                Price = request.Price,
-                City = request.City
-            };
-
-            if (request.Image != null)
-            {
-                var imagePath = Path.Combine("uploads", $"{Guid.NewGuid()}{Path.GetExtension(request.Image.FileName)}");
+                var imagePath = Path.Combine("uploads", $"{Guid.NewGuid()}{Path.GetExtension(createLocationRequest.Image.FileName)}");
                 using (var stream = new FileStream(imagePath, FileMode.Create))
                 {
-                    await request.Image.CopyToAsync(stream);
+                    await createLocationRequest.Image.CopyToAsync(stream);
                 }
-                locationDto.ImagePath = imagePath;
+                createLocationRequest.ImagePath = imagePath;
             }
 
-            var location = _mapper.Map<Location>(locationDto);
-            await _locationService.CreateLocationAsync(location);
-            return CreatedAtAction(nameof(GetLocationById), new { id = location.Id }, location);
+            var locationDto = _mapper.Map<LocationDto>(createLocationRequest);
+            await _locationService.CreateLocationAsync(locationDto);
+            return CreatedAtAction(nameof(GetLocationById), new { id = locationDto.Id }, locationDto);
         }
 
-        [HttpGet]
-        [Route("search")]
-        public async Task<ActionResult<IEnumerable<LocationDto>>> SearchLocations(string searchTerm, DateTime? availableFrom = null, DateTime? availableTo = null, decimal? maxPrice = null, int? maxGuests = null)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateLocation(int id, [FromBody] LocationDto locationDto)
+        {
+            await _locationService.UpdateLocationAsync(id, locationDto);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteLocation(int id)
+        {
+            await _locationService.DeleteLocationAsync(id);
+            return NoContent();
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchLocations(string searchTerm, DateTime? availableFrom = null, DateTime? availableTo = null, decimal? maxPrice = null, int? maxGuests = null)
         {
             var locations = await _locationService.SearchLocationsAsync(searchTerm, availableFrom, availableTo, maxPrice, maxGuests);
             return Ok(locations);

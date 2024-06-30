@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using SkyOdyssey.Models;
 using SkyOdyssey.DTOs;
+using SkyOdyssey.Models;
 
 namespace SkyOdyssey.Mappings
 {
@@ -8,14 +8,13 @@ namespace SkyOdyssey.Mappings
     {
         public MappingProfile()
         {
+            CreateMap<Location, LocationDto>().ReverseMap();
+            CreateMap<CreateLocationRequest, LocationDto>().ReverseMap();
+            CreateMap<Reservation, ReservationDto>().ReverseMap();
             CreateMap<Flight, FlightDto>().ReverseMap();
             CreateMap<Hotel, HotelDto>().ReverseMap();
-            CreateMap<Location, LocationDto>().ReverseMap();
-            CreateMap<Reservation, ReservationDto>().ReverseMap();
-            CreateMap<User, UserDto>().ReverseMap();
-            CreateMap<RegisterUserDto, User>();
-            CreateMap<CreateReservationDto, Reservation>();
-            CreateMap<UpdateReservationDto, Reservation>();
+            CreateMap<CreateReservationDto, Reservation>().ReverseMap();
+            CreateMap<UpdateReservationDto, Reservation>().ReverseMap();
         }
     }
 }
