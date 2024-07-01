@@ -1,4 +1,7 @@
-﻿namespace SkyOdyssey.DTOs
+﻿using System;
+using System.Collections.Generic;
+
+namespace SkyOdyssey.DTOs
 {
     public class UpdateReservationDto
     {
@@ -8,10 +11,10 @@
         public int NumberOfGuests { get; set; }
         public decimal TotalPrice { get; set; }
         public int UserId { get; set; }
-        public int LocationId { get; set; }
+        public List<int> LocationIds { get; set; }
+        public List<int> FlightIds { get; set; }
+        public List<FlightDto> Flights { get; set; }
+        public List<LocationDto> Locations { get; set; }
         public string Status { get; set; }
-
-        public ICollection<LocationDto> Location { get; set; }
-        public ICollection<FlightDto> Flights { get; set; }
     }
 }

@@ -85,7 +85,7 @@ namespace SkyOdyssey.Migrations
                     ArrivalTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Price = table.Column<decimal>(type: "TEXT", nullable: false),
                     Airline = table.Column<string>(type: "TEXT", nullable: false),
-                    ReservationId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ReservationId = table.Column<int>(type: "INTEGER", nullable: true),
                     LocationId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -101,8 +101,7 @@ namespace SkyOdyssey.Migrations
                         name: "FK_Flights_Reservations_ReservationId",
                         column: x => x.ReservationId,
                         principalTable: "Reservations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(

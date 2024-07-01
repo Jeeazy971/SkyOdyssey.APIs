@@ -10,6 +10,6 @@ namespace SkyOdyssey.Models
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
 
-        public ICollection<Reservation> Reservations { get; set; }
+        public List<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

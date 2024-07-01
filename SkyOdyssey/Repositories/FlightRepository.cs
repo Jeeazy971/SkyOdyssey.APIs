@@ -25,6 +25,11 @@ namespace SkyOdyssey.Repositories
             return await _context.Flights.Include(f => f.Reservation).Include(f => f.Location).SingleOrDefaultAsync(f => f.Id == id);
         }
 
+        public async Task<IEnumerable<Flight>> GetByIdsAsync(IEnumerable<int> ids)
+        {
+            return await _context.Flights.Where(f => ids.Contains(f.Id)).ToListAsync();
+        }
+
         public async Task AddAsync(Flight flight)
         {
             await _context.Flights.AddAsync(flight);

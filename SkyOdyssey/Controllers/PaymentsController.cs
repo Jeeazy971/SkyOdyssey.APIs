@@ -50,7 +50,7 @@ namespace SkyOdyssey.Controllers
             {
                 Amount = (long)(paymentDto.Amount * 100), // Montant en centimes
                 Currency = paymentDto.Currency,
-                Description = $"Payment for reservation {paymentDto.ReservationId}",
+                Description = $"Paiement pour la réservation {paymentDto.ReservationId}",
                 Source = paymentDto.Token
             };
 
@@ -69,20 +69,22 @@ namespace SkyOdyssey.Controllers
             {
                 var updateReservationDto = new UpdateReservationDto
                 {
+                    Id = reservation.Id,
                     StartDate = reservation.StartDate,
                     EndDate = reservation.EndDate,
                     NumberOfGuests = reservation.NumberOfGuests,
                     TotalPrice = reservation.TotalPrice,
+                    UserId = reservation.UserId,
                     Status = "Paid",
                     Flights = reservation.Flights,
-                    Location = reservation.Locations
+                    Locations = reservation.Locations
                 };
 
                 await _reservationService.UpdateReservationAsync(reservation.Id, updateReservationDto);
                 return Ok();
             }
 
-            return BadRequest(new { error = "Payment failed" });
+            return BadRequest(new { error = "Le paiement à échoué" });
         }
     }
 }

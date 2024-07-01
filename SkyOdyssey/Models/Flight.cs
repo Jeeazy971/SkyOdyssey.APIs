@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SkyOdyssey.Models
 {
@@ -13,7 +14,7 @@ namespace SkyOdyssey.Models
         public decimal Price { get; set; }
         public string Airline { get; set; }
 
-        public int ReservationId { get; set; }
+        public int? ReservationId { get; set; } // Peut être null si pas encore associé
         public Reservation Reservation { get; set; }
 
         public int LocationId { get; set; }

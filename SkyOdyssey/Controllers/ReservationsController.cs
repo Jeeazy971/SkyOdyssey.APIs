@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SkyOdyssey.DTOs;
 using SkyOdyssey.Services;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 [ApiController]
@@ -58,7 +57,7 @@ public class ReservationsController : ControllerBase
         try
         {
             await _reservationService.CreateReservationAsync(createReservationDto);
-            return CreatedAtAction(nameof(GetReservationById), new { id = createReservationDto.Id }, createReservationDto);
+            return CreatedAtAction(nameof(GetReservationById), new { id = createReservationDto.UserId }, createReservationDto);
         }
         catch (Exception ex)
         {

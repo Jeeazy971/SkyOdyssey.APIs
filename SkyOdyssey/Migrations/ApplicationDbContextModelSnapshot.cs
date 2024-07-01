@@ -66,7 +66,7 @@ namespace SkyOdyssey.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ReservationId")
+                    b.Property<int?>("ReservationId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -231,9 +231,7 @@ namespace SkyOdyssey.Migrations
 
                     b.HasOne("SkyOdyssey.Models.Reservation", "Reservation")
                         .WithMany("Flights")
-                        .HasForeignKey("ReservationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ReservationId");
 
                     b.Navigation("Location");
 

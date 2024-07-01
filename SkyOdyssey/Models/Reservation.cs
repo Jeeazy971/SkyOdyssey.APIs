@@ -15,8 +15,8 @@ namespace SkyOdyssey.Models
         public int UserId { get; set; }
         public User User { get; set; }
 
-        public ICollection<Flight> Flights { get; set; } = new List<Flight>();
-        public ICollection<Hotel> Hotels { get; set; } = new List<Hotel>();
+        public List<Flight> Flights { get; set; } = new List<Flight>();
+        public List<Hotel> Hotels { get; set; } = new List<Hotel>();
         public List<Location> Locations { get; set; } = new List<Location>();
     }
 }

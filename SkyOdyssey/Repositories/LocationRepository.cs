@@ -27,6 +27,11 @@ namespace SkyOdyssey.Repositories
             return await _context.Locations.FindAsync(id);
         }
 
+        public async Task<IEnumerable<Location>> GetByIdsAsync(IEnumerable<int> ids)
+        {
+            return await _context.Locations.Where(l => ids.Contains(l.Id)).ToListAsync();
+        }
+
         public async Task AddAsync(Location location)
         {
             await _context.Locations.AddAsync(location);

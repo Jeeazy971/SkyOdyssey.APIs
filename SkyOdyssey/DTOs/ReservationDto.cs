@@ -11,10 +11,8 @@ namespace SkyOdyssey.DTOs
         public int NumberOfGuests { get; set; }
         public decimal TotalPrice { get; set; }
         public string Status { get; set; }
-
         public int UserId { get; set; }
-
-        public ICollection<FlightDto> Flights { get; set; } = new List<FlightDto>();
-        public ICollection<LocationDto> Locations { get; set; } = new List<LocationDto>();
+        public List<FlightDto> Flights { get; set; }
+        public List<LocationDto> Locations { get; set; }
     }
 }

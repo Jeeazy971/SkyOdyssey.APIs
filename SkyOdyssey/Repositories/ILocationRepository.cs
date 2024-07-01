@@ -8,6 +8,7 @@ namespace SkyOdyssey.Repositories
     public interface ILocationRepository
     {
         Task<IEnumerable<Location>> GetAllAsync();
+        Task<IEnumerable<Location>> GetByIdsAsync(IEnumerable<int> ids);
         Task<Location> GetByIdAsync(int id);
         Task AddAsync(Location location);
         Task UpdateAsync(Location location);

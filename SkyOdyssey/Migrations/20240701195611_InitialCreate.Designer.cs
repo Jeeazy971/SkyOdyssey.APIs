@@ -11,7 +11,7 @@ using SkyOdyssey.Data;
 namespace SkyOdyssey.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240701171949_InitialCreate")]
+    [Migration("20240701195611_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -69,7 +69,7 @@ namespace SkyOdyssey.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ReservationId")
+                    b.Property<int?>("ReservationId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -234,9 +234,7 @@ namespace SkyOdyssey.Migrations
 
                     b.HasOne("SkyOdyssey.Models.Reservation", "Reservation")
                         .WithMany("Flights")
-                        .HasForeignKey("ReservationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ReservationId");
 
                     b.Navigation("Location");
 

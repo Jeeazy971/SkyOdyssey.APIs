@@ -85,67 +85,13 @@ namespace SkyOdyssey.Data
                 });
 
             var users = userFaker.Generate(10);
+            await context.Users.AddRangeAsync(users);
+            await context.SaveChangesAsync();
 
             var locationIds = 1;
-            var hotelNames = new[]
-            {
-                "Grand Plaza Hotel",
-                "Ocean View Resort",
-                "Mountain Escape Lodge",
-                "City Lights Hotel",
-                "Sunset Paradise Inn",
-                "Royal Continental Hotel",
-                "Harmony Suites",
-                "Azure Sky Hotel",
-                "Elite Crown Hotel",
-                "Golden Gate Resort",
-                "Crystal Waters Hotel",
-                "Majestic Palace",
-                "Urban Oasis Hotel",
-                "Regal Retreat",
-                "Infinity Bay Resort",
-                "Paradise Cove Resort",
-                "Luxe Downtown Hotel",
-                "Sapphire Sands Hotel",
-                "Imperial Heights",
-                "Serenity Springs Resort",
-                "Opulent Horizons Hotel",
-                "Emerald Gardens Hotel",
-                "Tranquil Haven Resort",
-                "Radiant Shores Hotel",
-                "Prestige Grand Hotel",
-                "Sunrise Vista Inn",
-                "Palazzo Royale Hotel",
-                "Elysium Suites",
-                "Blissful Meadows Hotel",
-                "Aurora Heights Hotel",
-                "Starlight Grand Hotel",
-                "Cascade Peaks Lodge",
-                "Luxury Lagoon Resort",
-                "Heritage Palace Hotel",
-                "Zenith Sky Hotel",
-                "Monarch Bay Resort",
-                "Golden Age Hotel",
-                "Serene Heights Hotel",
-                "Opal Shores Resort",
-                "Regency Grand Hotel",
-                "Pearl Island Resort",
-                "Harmony Hills Hotel",
-                "Vista Mar Resort",
-                "Majestic Garden Hotel",
-                "Sunset Crest Hotel",
-                "Royal Summit Resort",
-                "Aqua Marina Hotel",
-                "Crystal Peak Resort",
-                "Opulent Bay Hotel",
-                "Shimmering Sands Resort",
-                "Tranquil Bay Hotel",
-                "Eden Gardens Hotel"
-            };
-
             var locationFaker = new Faker<Location>("fr")
                 .RuleFor(l => l.Id, f => locationIds++)
-                .RuleFor(l => l.Name, f => f.PickRandom(hotelNames))
+                .RuleFor(l => l.Name, (f, l) => $"{f.Address.City()} Hotel")
                 .RuleFor(l => l.Description, (f, l) =>
                     $"Profitez de notre hôtel {l.Name} situé au cœur de {l.City}. Nos chambres offrent un confort exceptionnel avec des équipements modernes, y compris Wi-Fi gratuit, télévision à écran plat, minibar, et plus encore. Détendez-vous dans notre spa ou profitez de notre salle de sport entièrement équipée. Idéalement situé près des attractions touristiques locales et des centres d'affaires.")
                 .RuleFor(l => l.AvailableFrom, f => f.Date.Past())
@@ -166,17 +112,8 @@ namespace SkyOdyssey.Data
                 locations.Add(location);
             }
 
-            var reservationIds = 1;
-            var reservationFaker = new Faker<Reservation>("fr")
-                .RuleFor(r => r.Id, f => reservationIds++)
-                .RuleFor(r => r.StartDate, f => f.Date.Past())
-                .RuleFor(r => r.EndDate, f => f.Date.Future())
-                .RuleFor(r => r.NumberOfGuests, f => f.Random.Int(1, 10))
-                .RuleFor(r => r.TotalPrice, f => Math.Round(f.Random.Decimal(100, 1500), 2))
-                .RuleFor(r => r.UserId, f => f.PickRandom(users).Id)
-                .RuleFor(r => r.Status, f => "Pending");
-
-            var reservations = reservationFaker.Generate(200);
+            await context.Locations.AddRangeAsync(locations);
+            await context.SaveChangesAsync();
 
             var airlines = new[] { "Air France", "British Airways", "Lufthansa", "Emirates", "Qatar Airways", "Delta Airlines", "American Airlines", "KLM", "Singapore Airlines", "Turkish Airlines" };
 
@@ -194,19 +131,34 @@ namespace SkyOdyssey.Data
                 })
                 .RuleFor(f => f.Price, f => Math.Round(f.Random.Decimal(100, 1200), 2))
                 .RuleFor(f => f.Airline, f => f.PickRandom(airlines))
-                .RuleFor(f => f.ReservationId, f => f.PickRandom(reservations).Id)
                 .RuleFor(f => f.LocationId, f => f.PickRandom(locations).Id);
 
             var flights = flightFaker.Generate(200);
+            await context.Flights.AddRangeAsync(flights);
+            await context.SaveChangesAsync();
 
-            context.Users.AddRange(users);
-            context.Locations.AddRange(locations);
-            context.Reservations.AddRange(reservations);
-            context.Flights.AddRange(flights);
+            var reservationIds = 1;
+            var reservationFaker = new Faker<Reservation>("fr")
+                .RuleFor(r => r.Id, f => reservationIds++)
+                .RuleFor(r => r.StartDate, f => f.Date.Past())
+                .RuleFor(r => r.EndDate, f => f.Date.Future())
+                .RuleFor(r => r.NumberOfGuests, f => f.Random.Int(1, 10))
+                .RuleFor(r => r.TotalPrice, f => Math.Round(f.Random.Decimal(100, 1500), 2))
+                .RuleFor(r => r.UserId, f => f.PickRandom(users).Id)
+                .RuleFor(r => r.Status, f => "Pending");
 
-            // Assign Locations to Reservations
+            var reservations = reservationFaker.Generate(200);
+            await context.Reservations.AddRangeAsync(reservations);
+            await context.SaveChangesAsync();
+
             foreach (var reservation in reservations)
             {
+                var assignedFlights = flights.OrderBy(x => Guid.NewGuid()).Take(2).ToList(); // Take 2 random flights for each reservation
+                foreach (var flight in assignedFlights)
+                {
+                    flight.ReservationId = reservation.Id;
+                }
+
                 var assignedLocations = locations.OrderBy(x => Guid.NewGuid()).Take(2).ToList(); // Take 2 random locations for each reservation
                 reservation.Locations.AddRange(assignedLocations);
             }
