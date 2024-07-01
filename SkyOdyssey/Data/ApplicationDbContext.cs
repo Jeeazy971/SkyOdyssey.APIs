@@ -1,10 +1,14 @@
 ﻿using Bogus;
 using Microsoft.EntityFrameworkCore;
 using SkyOdyssey.Models;
+using SkyOdyssey.Services;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SkyOdyssey.Data
 {
@@ -51,7 +55,7 @@ namespace SkyOdyssey.Data
                 .HasForeignKey(h => h.ReservationId);
         }
 
-        public static void SeedData(ApplicationDbContext context)
+        public static async Task SeedData(ApplicationDbContext context, UnsplashService unsplashService)
         {
             if (context.Users.Any() || context.Locations.Any() || context.Flights.Any() || context.Reservations.Any() || context.Hotels.Any())
             {
@@ -81,8 +85,7 @@ namespace SkyOdyssey.Data
             var locationIds = 1;
             var locationFaker = new Faker<Location>("fr")
                 .RuleFor(l => l.Id, f => locationIds++)
-                .RuleFor(l => l.City, f => f.Address.City())
-                .RuleFor(l => l.Name, (f, l) => $"{l.City} Hotel")
+                .RuleFor(l => l.Name, (f, l) => $"{f.Address.City()} Hotel")
                 .RuleFor(l => l.Description, (f, l) =>
                     $"Profitez de notre hôtel {l.Name} situé au cœur de {l.City}. Nos chambres offrent un confort exceptionnel avec des équipements modernes, y compris Wi-Fi gratuit, télévision à écran plat, minibar, et plus encore. Détendez-vous dans notre spa ou profitez de notre salle de sport entièrement équipée. Idéalement situé près des attractions touristiques locales et des centres d'affaires.")
                 .RuleFor(l => l.AvailableFrom, f => f.Date.Past())
@@ -90,9 +93,18 @@ namespace SkyOdyssey.Data
                 .RuleFor(l => l.MaxGuests, f => f.Random.Int(1, 10))
                 .RuleFor(l => l.IncludesTransport, f => f.Random.Bool())
                 .RuleFor(l => l.Price, f => Math.Round(f.Random.Decimal(50, 3000), 2))
-                .RuleFor(l => l.ImagePath, f => $"uploads/{f.Random.Guid()}.jpg");
+                .RuleFor(l => l.City, f => f.Address.City());
 
-            var locations = locationFaker.Generate(100);
+            var locations = new List<Location>();
+
+            foreach (var location in locationFaker.Generate(100))
+            {
+                var imageUrl = await unsplashService.GetRandomHotelRoomImageAsync();
+                var imagePath = Path.Combine("wwwroot", "uploads", $"{Guid.NewGuid()}.jpg");
+                await unsplashService.DownloadImageAsync(imageUrl, imagePath);
+                location.ImagePath = imagePath;
+                locations.Add(location);
+            }
 
             var reservationIds = 1;
             var reservationFaker = new Faker<Reservation>("fr")
@@ -115,8 +127,12 @@ namespace SkyOdyssey.Data
                 .RuleFor(f => f.FlightNumber, f => f.Random.String2(5, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"))
                 .RuleFor(f => f.DepartureAirport, f => $"{f.Address.City()} International Airport")
                 .RuleFor(f => f.ArrivalAirport, f => $"{f.Address.City()} International Airport")
-                .RuleFor(f => f.DepartureTime, f => f.Date.Future())
-                .RuleFor(f => f.ArrivalTime, f => f.Date.Future())
+                .RuleFor(f => f.DepartureTime, f => f.Date.Future(1))
+                .RuleFor(f => f.ArrivalTime, (f, flight) =>
+                {
+                    var departureTime = flight.DepartureTime;
+                    return departureTime.AddHours(f.Random.Double(1, 12)); // Flight duration between 1 to 12 hours
+                })
                 .RuleFor(f => f.Price, f => Math.Round(f.Random.Decimal(100, 1200), 2))
                 .RuleFor(f => f.Airline, f => f.PickRandom(airlines))
                 .RuleFor(f => f.ReservationId, f => f.PickRandom(reservations).Id)
@@ -128,7 +144,7 @@ namespace SkyOdyssey.Data
             context.Locations.AddRange(locations);
             context.Reservations.AddRange(reservations);
             context.Flights.AddRange(flights);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 

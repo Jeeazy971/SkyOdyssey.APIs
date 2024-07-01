@@ -42,5 +42,12 @@ namespace SkyOdyssey.Controllers
             await _flightService.CreateFlightAsync(flightDto);
             return CreatedAtAction(nameof(GetFlightById), new { id = flightDto.Id }, flightDto);
         }
+
+        [HttpGet("by-location/{locationId}")]
+        public async Task<IActionResult> GetFlightsByLocationDestination(int locationId)
+        {
+            var flights = await _flightService.GetFlightsByLocationDestinationAsync(locationId);
+            return Ok(flights);
+        }
     }
 }

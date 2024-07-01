@@ -9,5 +9,6 @@ namespace SkyOdyssey.Repositories
         Task<IEnumerable<Flight>> GetAllAsync();
         Task<Flight> GetByIdAsync(int id);
         Task AddAsync(Flight flight);
+        Task<IEnumerable<Flight>> GetFlightsByLocationDestinationAsync(int locationId);
     }
 }

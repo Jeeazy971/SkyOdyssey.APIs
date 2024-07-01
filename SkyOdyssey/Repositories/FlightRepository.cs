@@ -30,5 +30,12 @@ namespace SkyOdyssey.Repositories
             await _context.Flights.AddAsync(flight);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Flight>> GetFlightsByLocationDestinationAsync(int locationId)
+        {
+            return await _context.Flights
+                .Where(f => f.LocationId == locationId)
+                .ToListAsync();
+        }
     }
 }

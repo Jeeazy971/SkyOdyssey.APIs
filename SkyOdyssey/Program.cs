@@ -50,6 +50,8 @@ builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IFlightRepository, FlightRepository>();
 builder.Services.AddScoped<IFlightService, FlightService>();
 
+builder.Services.AddHttpClient<UnsplashService>();
+
 // Configure CORS to allow any origin, method, and header
 builder.Services.AddCors(options =>
 {
@@ -73,6 +75,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles(); // Servir les fichiers statiques du dossier wwwroot
+
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
@@ -84,8 +88,9 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var unsplashService = scope.ServiceProvider.GetRequiredService<UnsplashService>();
     context.Database.Migrate();
-    ApplicationDbContext.SeedData(context);
+    await ApplicationDbContext.SeedData(context, unsplashService);
 }
 
 app.Run();

@@ -3,6 +3,7 @@ using SkyOdyssey.Services;
 using AutoMapper;
 using SkyOdyssey.DTOs;
 using SkyOdyssey.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -43,7 +44,7 @@ namespace SkyOdyssey.Controllers
         {
             if (createLocationRequest.Image != null)
             {
-                var imagePath = Path.Combine("uploads", $"{Guid.NewGuid()}{Path.GetExtension(createLocationRequest.Image.FileName)}");
+                var imagePath = Path.Combine("wwwroot", "uploads", $"{Guid.NewGuid()}{Path.GetExtension(createLocationRequest.Image.FileName)}");
                 using (var stream = new FileStream(imagePath, FileMode.Create))
                 {
                     await createLocationRequest.Image.CopyToAsync(stream);
