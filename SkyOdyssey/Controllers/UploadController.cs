@@ -23,7 +23,14 @@ namespace SkyOdyssey.Controllers
             if (file == null || file.Length == 0)
                 return BadRequest("Fichier non sélectionné");
 
-            var filePath = Path.Combine(_env.WebRootPath, "uploads", file.FileName);
+            var uploadsPath = Path.Combine(_env.WebRootPath, "uploads");
+
+            if (!Directory.Exists(uploadsPath))
+            {
+                Directory.CreateDirectory(uploadsPath);
+            }
+
+            var filePath = Path.Combine(uploadsPath, file.FileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {

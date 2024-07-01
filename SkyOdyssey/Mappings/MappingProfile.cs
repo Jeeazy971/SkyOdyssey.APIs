@@ -8,6 +8,8 @@ namespace SkyOdyssey.Mappings
     {
         public MappingProfile()
         {
+            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<RegisterUserDto, User>().ReverseMap();
             CreateMap<Location, LocationDto>().ReverseMap();
             CreateMap<CreateLocationRequest, LocationDto>().ReverseMap();
             CreateMap<Reservation, ReservationDto>().ReverseMap();
