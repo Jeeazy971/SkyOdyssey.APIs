@@ -16,7 +16,7 @@ namespace SkyOdyssey.Models
         public string City { get; set; }
         public string ImagePath { get; set; }
 
-        public ICollection<Reservation> Reservations { get; set; }
-        public ICollection<Flight> Flights { get; set; }
+        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+        public ICollection<Flight> Flights { get; set; } = new List<Flight>();
     }
 }

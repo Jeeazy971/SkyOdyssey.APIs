@@ -59,18 +59,11 @@ namespace SkyOdyssey.Migrations
                     NumberOfGuests = table.Column<int>(type: "INTEGER", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "TEXT", nullable: false),
                     Status = table.Column<string>(type: "TEXT", nullable: false),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    LocationId = table.Column<int>(type: "INTEGER", nullable: false)
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reservations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Reservations_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_Users_UserId",
                         column: x => x.UserId,
@@ -134,6 +127,30 @@ namespace SkyOdyssey.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ReservationLocation",
+                columns: table => new
+                {
+                    LocationId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ReservationId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReservationLocation", x => new { x.LocationId, x.ReservationId });
+                    table.ForeignKey(
+                        name: "FK_ReservationLocation_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ReservationLocation_Reservations_ReservationId",
+                        column: x => x.ReservationId,
+                        principalTable: "Reservations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Flights_LocationId",
                 table: "Flights",
@@ -150,9 +167,9 @@ namespace SkyOdyssey.Migrations
                 column: "ReservationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservations_LocationId",
-                table: "Reservations",
-                column: "LocationId");
+                name: "IX_ReservationLocation_ReservationId",
+                table: "ReservationLocation",
+                column: "ReservationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_UserId",
@@ -170,10 +187,13 @@ namespace SkyOdyssey.Migrations
                 name: "Hotels");
 
             migrationBuilder.DropTable(
-                name: "Reservations");
+                name: "ReservationLocation");
 
             migrationBuilder.DropTable(
                 name: "Locations");
+
+            migrationBuilder.DropTable(
+                name: "Reservations");
 
             migrationBuilder.DropTable(
                 name: "Users");

@@ -9,25 +9,22 @@ namespace SkyOdyssey.Mappings
         public MappingProfile()
         {
             // Map User to UserDto and vice versa
-            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<User, UserDto>();
+            CreateMap<UserDto, User>();
+
+            // Map RegisterUserDto to User
             CreateMap<RegisterUserDto, User>();
 
-            // Map Location to LocationDto and vice versa
+            // Other mappings
             CreateMap<Location, LocationDto>().ReverseMap();
             CreateMap<CreateLocationRequest, LocationDto>().ReverseMap();
-
-            // Map Reservation to ReservationDto and vice versa
             CreateMap<Reservation, ReservationDto>()
-                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location))
+                .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.Locations))
                 .ReverseMap();
+            CreateMap<Flight, FlightDto>().ReverseMap();
+            CreateMap<Hotel, HotelDto>().ReverseMap();
             CreateMap<CreateReservationDto, Reservation>().ReverseMap();
             CreateMap<UpdateReservationDto, Reservation>().ReverseMap();
-
-            // Map Flight to FlightDto and vice versa
-            CreateMap<Flight, FlightDto>().ReverseMap();
-
-            // Map Hotel to HotelDto and vice versa
-            CreateMap<Hotel, HotelDto>().ReverseMap();
         }
     }
 }

@@ -3,34 +3,30 @@ using SkyOdyssey.DTOs;
 using SkyOdyssey.Models;
 using SkyOdyssey.Repositories;
 using SkyOdyssey.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class ReservationService : IReservationService
 {
     private readonly IReservationRepository _reservationRepository;
-    private readonly ILocationRepository _locationRepository;
-    private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
 
-    public ReservationService(IReservationRepository reservationRepository, ILocationRepository locationRepository, IUserRepository userRepository, IMapper mapper)
+    public ReservationService(IReservationRepository reservationRepository, IMapper mapper)
     {
         _reservationRepository = reservationRepository;
-        _locationRepository = locationRepository;
-        _userRepository = userRepository;
         _mapper = mapper;
     }
 
     public async Task<IEnumerable<ReservationDto>> GetAllReservationsAsync()
     {
         var reservations = await _reservationRepository.GetAllAsync();
-        var reservationDtos = _mapper.Map<IEnumerable<ReservationDto>>(reservations);
-        return reservationDtos;
+        return _mapper.Map<IEnumerable<ReservationDto>>(reservations);
     }
 
     public async Task<ReservationDto> GetReservationByIdAsync(int id)
     {
         var reservation = await _reservationRepository.GetByIdAsync(id);
-        var reservationDto = _mapper.Map<ReservationDto>(reservation);
-        return reservationDto;
+        return _mapper.Map<ReservationDto>(reservation);
     }
 
     public async Task CreateReservationAsync(CreateReservationDto createReservationDto)

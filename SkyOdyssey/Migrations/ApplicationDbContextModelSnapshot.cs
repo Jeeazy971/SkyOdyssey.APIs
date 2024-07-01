@@ -17,6 +17,21 @@ namespace SkyOdyssey.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
 
+            modelBuilder.Entity("ReservationLocation", b =>
+                {
+                    b.Property<int>("LocationId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("LocationId", "ReservationId");
+
+                    b.HasIndex("ReservationId");
+
+                    b.ToTable("ReservationLocation");
+                });
+
             modelBuilder.Entity("SkyOdyssey.Models.Flight", b =>
                 {
                     b.Property<int>("Id")
@@ -141,9 +156,6 @@ namespace SkyOdyssey.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("LocationId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("INTEGER");
 
@@ -161,8 +173,6 @@ namespace SkyOdyssey.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("LocationId");
 
                     b.HasIndex("UserId");
 
@@ -194,6 +204,21 @@ namespace SkyOdyssey.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("ReservationLocation", b =>
+                {
+                    b.HasOne("SkyOdyssey.Models.Location", null)
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SkyOdyssey.Models.Reservation", null)
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SkyOdyssey.Models.Flight", b =>
@@ -228,19 +253,11 @@ namespace SkyOdyssey.Migrations
 
             modelBuilder.Entity("SkyOdyssey.Models.Reservation", b =>
                 {
-                    b.HasOne("SkyOdyssey.Models.Location", "Location")
-                        .WithMany("Reservations")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("SkyOdyssey.Models.User", "User")
                         .WithMany("Reservations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Location");
 
                     b.Navigation("User");
                 });
@@ -248,8 +265,6 @@ namespace SkyOdyssey.Migrations
             modelBuilder.Entity("SkyOdyssey.Models.Location", b =>
                 {
                     b.Navigation("Flights");
-
-                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("SkyOdyssey.Models.Reservation", b =>

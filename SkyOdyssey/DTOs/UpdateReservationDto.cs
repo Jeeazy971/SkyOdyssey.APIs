@@ -11,7 +11,7 @@
         public int LocationId { get; set; }
         public string Status { get; set; }
 
-        public LocationDto Location { get; set; }
+        public ICollection<LocationDto> Location { get; set; }
         public ICollection<FlightDto> Flights { get; set; }
     }
 }
