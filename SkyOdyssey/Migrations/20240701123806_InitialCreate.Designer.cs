@@ -11,7 +11,7 @@ using SkyOdyssey.Data;
 namespace SkyOdyssey.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240630183332_InitialCreate")]
+    [Migration("20240701123806_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

@@ -1,7 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using SkyOdyssey.DTOs;
 using SkyOdyssey.Models;
 using SkyOdyssey.Repositories;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,11 +17,13 @@ namespace SkyOdyssey.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
-        public UserService(IUserRepository userRepository, IMapper mapper)
+        public UserService(IUserRepository userRepository, IMapper mapper, IConfiguration configuration)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
         public async Task<UserDto> Authenticate(string username, string password)
@@ -25,7 +32,11 @@ namespace SkyOdyssey.Services
             if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
                 return null;
 
-            return _mapper.Map<UserDto>(user);
+            var token = GenerateJwtToken(user);
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.Token = token;
+
+            return userDto;
         }
 
         public async Task<UserDto> Register(RegisterUserDto registerUserDto)
@@ -35,16 +46,15 @@ namespace SkyOdyssey.Services
 
             CreatePasswordHash(registerUserDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            var user = new User
-            {
-                Username = registerUserDto.Username,
-                Email = registerUserDto.Email,
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt
-            };
+            var user = _mapper.Map<User>(registerUserDto);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
 
             await _userRepository.AddAsync(user);
-            return _mapper.Map<UserDto>(user);
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.Token = GenerateJwtToken(user);
+
+            return userDto;
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
@@ -67,6 +77,20 @@ namespace SkyOdyssey.Services
                 }
             }
             return true;
+        }
+
+        private string GenerateJwtToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()) }),
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpiryMinutes"])),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
     }
 }
