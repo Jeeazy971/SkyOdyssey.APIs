@@ -77,7 +77,7 @@ namespace SkyOdyssey.Controllers
                     LocationId = reservation.LocationId,
                     Status = "Paid",
                     Flights = reservation.Flights,
-                    Hotels = reservation.Hotels
+                    Location = reservation.Location
                 };
 
                 await _reservationService.UpdateReservationAsync(reservation.Id, updateReservationDto);

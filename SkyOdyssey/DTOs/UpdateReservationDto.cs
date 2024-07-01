@@ -10,7 +10,8 @@
         public int UserId { get; set; }
         public int LocationId { get; set; }
         public string Status { get; set; }
-        public List<FlightDto> Flights { get; set; }
-        public List<HotelDto> Hotels { get; set; }
+
+        public LocationDto Location { get; set; }
+        public ICollection<FlightDto> Flights { get; set; }
     }
 }
