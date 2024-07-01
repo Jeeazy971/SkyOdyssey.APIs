@@ -1,62 +1,60 @@
-﻿using SkyOdyssey.DTOs;
+﻿using AutoMapper;
+using SkyOdyssey.DTOs;
 using SkyOdyssey.Models;
 using SkyOdyssey.Repositories;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoMapper;
+using SkyOdyssey.Services;
 
-namespace SkyOdyssey.Services
+public class ReservationService : IReservationService
 {
-    public class ReservationService : IReservationService
+    private readonly IReservationRepository _reservationRepository;
+    private readonly ILocationRepository _locationRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
+
+    public ReservationService(IReservationRepository reservationRepository, ILocationRepository locationRepository, IUserRepository userRepository, IMapper mapper)
     {
-        private readonly IReservationRepository _reservationRepository;
-        private readonly IMapper _mapper;
+        _reservationRepository = reservationRepository;
+        _locationRepository = locationRepository;
+        _userRepository = userRepository;
+        _mapper = mapper;
+    }
 
-        public ReservationService(IReservationRepository reservationRepository, IMapper mapper)
+    public async Task<IEnumerable<ReservationDto>> GetAllReservationsAsync()
+    {
+        var reservations = await _reservationRepository.GetAllAsync();
+        var reservationDtos = _mapper.Map<IEnumerable<ReservationDto>>(reservations);
+        return reservationDtos;
+    }
+
+    public async Task<ReservationDto> GetReservationByIdAsync(int id)
+    {
+        var reservation = await _reservationRepository.GetByIdAsync(id);
+        var reservationDto = _mapper.Map<ReservationDto>(reservation);
+        return reservationDto;
+    }
+
+    public async Task CreateReservationAsync(CreateReservationDto createReservationDto)
+    {
+        var reservation = _mapper.Map<Reservation>(createReservationDto);
+        await _reservationRepository.AddAsync(reservation);
+    }
+
+    public async Task UpdateReservationAsync(int id, UpdateReservationDto updateReservationDto)
+    {
+        var reservation = await _reservationRepository.GetByIdAsync(id);
+        if (reservation != null)
         {
-            _reservationRepository = reservationRepository;
-            _mapper = mapper;
-        }
-
-        public async Task<IEnumerable<ReservationDto>> GetAllReservationsAsync()
-        {
-            var reservations = await _reservationRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<ReservationDto>>(reservations);
-        }
-
-        public async Task<ReservationDto> GetReservationByIdAsync(int id)
-        {
-            var reservation = await _reservationRepository.GetByIdAsync(id);
-            return _mapper.Map<ReservationDto>(reservation);
-        }
-
-        public async Task CreateReservationAsync(CreateReservationDto createReservationDto)
-        {
-            var reservation = _mapper.Map<Reservation>(createReservationDto);
-            await _reservationRepository.AddAsync(reservation);
-            createReservationDto.Id = reservation.Id; // Mise à jour de l'ID après l'ajout
-        }
-
-        public async Task UpdateReservationAsync(int id, UpdateReservationDto updateReservationDto)
-        {
-            var reservation = await _reservationRepository.GetByIdAsync(id);
-            if (reservation == null)
-            {
-                // Handle not found error
-                return;
-            }
-
-            _mapper.Map(updateReservationDto, reservation); // Update existing reservation
+            _mapper.Map(updateReservationDto, reservation);
             await _reservationRepository.UpdateAsync(reservation);
         }
+    }
 
-        public async Task DeleteReservationAsync(int id)
+    public async Task DeleteReservationAsync(int id)
+    {
+        var reservation = await _reservationRepository.GetByIdAsync(id);
+        if (reservation != null)
         {
-            var reservation = await _reservationRepository.GetByIdAsync(id);
-            if (reservation != null)
-            {
-                await _reservationRepository.DeleteAsync(reservation);
-            }
+            await _reservationRepository.DeleteAsync(reservation);
         }
     }
 }

@@ -1,59 +1,99 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SkyOdyssey.Services;
-using AutoMapper;
 using SkyOdyssey.DTOs;
-using System.Threading.Tasks;
+using SkyOdyssey.Services;
 
-namespace SkyOdyssey.Controllers
+[ApiController]
+[Route("api/[controller]")]
+public class ReservationsController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ReservationsController : ControllerBase
+    private readonly IReservationService _reservationService;
+
+    public ReservationsController(IReservationService reservationService)
     {
-        private readonly IReservationService _reservationService;
-        private readonly IMapper _mapper;
+        _reservationService = reservationService;
+    }
 
-        public ReservationsController(IReservationService reservationService, IMapper mapper)
-        {
-            _reservationService = reservationService;
-            _mapper = mapper;
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAllReservations()
+    [HttpGet]
+    public async Task<IActionResult> GetAllReservations()
+    {
+        try
         {
             var reservations = await _reservationService.GetAllReservationsAsync();
             return Ok(reservations);
         }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Internal server error: " + ex.Message);
+        }
+    }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetReservationById(int id)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetReservationById(int id)
+    {
+        try
         {
             var reservation = await _reservationService.GetReservationByIdAsync(id);
             if (reservation == null)
+            {
                 return NotFound();
+            }
             return Ok(reservation);
         }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Internal server error: " + ex.Message);
+        }
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateReservation([FromBody] CreateReservationDto createReservationDto)
+    [HttpPost]
+    public async Task<IActionResult> CreateReservation([FromBody] CreateReservationDto createReservationDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
         {
             await _reservationService.CreateReservationAsync(createReservationDto);
             return CreatedAtAction(nameof(GetReservationById), new { id = createReservationDto.Id }, createReservationDto);
         }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Internal server error: " + ex.Message);
+        }
+    }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateReservation(int id, [FromBody] UpdateReservationDto updateReservationDto)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateReservation(int id, [FromBody] UpdateReservationDto updateReservationDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
         {
             await _reservationService.UpdateReservationAsync(id, updateReservationDto);
             return NoContent();
         }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Internal server error: " + ex.Message);
+        }
+    }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteReservation(int id)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteReservation(int id)
+    {
+        try
         {
             await _reservationService.DeleteReservationAsync(id);
             return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Internal server error: " + ex.Message);
         }
     }
 }
