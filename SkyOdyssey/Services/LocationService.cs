@@ -42,11 +42,10 @@ namespace SkyOdyssey.Services
             var location = await _locationRepository.GetByIdAsync(id);
             if (location == null)
             {
-                // Handle not found error
                 return;
             }
 
-            _mapper.Map(locationDto, location); // Update existing location
+            _mapper.Map(locationDto, location);
             await _locationRepository.UpdateAsync(location);
         }
 
@@ -58,6 +57,12 @@ namespace SkyOdyssey.Services
         public async Task<IEnumerable<LocationDto>> SearchLocationsAsync(string searchTerm, DateTime? availableFrom, DateTime? availableTo, decimal? maxPrice, int? maxGuests)
         {
             var locations = await _locationRepository.SearchAsync(searchTerm, availableFrom, availableTo, maxPrice, maxGuests);
+            return _mapper.Map<IEnumerable<LocationDto>>(locations);
+        }
+
+        public async Task<IEnumerable<LocationDto>> GetAvailableLocationsAsync()
+        {
+            var locations = await _locationRepository.GetAllAsync();
             return _mapper.Map<IEnumerable<LocationDto>>(locations);
         }
     }

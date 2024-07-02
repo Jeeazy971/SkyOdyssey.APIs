@@ -8,8 +8,7 @@
         public int NumberOfGuests { get; set; }
         public decimal TotalPrice { get; set; }
         public int UserId { get; set; }
-        public int LocationId { get; set; }
-        public ICollection<FlightDto> Flights { get; set; }
-        public ICollection<LocationDto> Location { get; set; }
+        public List<int> LocationIds { get; set; }
+        public List<int> FlightIds { get; set; }
     }
 }

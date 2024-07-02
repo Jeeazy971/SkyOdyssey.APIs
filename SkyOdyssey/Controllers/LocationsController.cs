@@ -77,5 +77,12 @@ namespace SkyOdyssey.Controllers
             var locations = await _locationService.SearchLocationsAsync(searchTerm, availableFrom, availableTo, maxPrice, maxGuests);
             return Ok(locations);
         }
+
+        [HttpGet("available")]
+        public async Task<ActionResult<IEnumerable<LocationDto>>> GetAvailableLocations()
+        {
+            var locations = await _locationService.GetAvailableLocationsAsync();
+            return Ok(locations);
+        }
     }
 }

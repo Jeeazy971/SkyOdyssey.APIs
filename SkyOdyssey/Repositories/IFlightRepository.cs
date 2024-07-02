@@ -8,7 +8,10 @@ namespace SkyOdyssey.Repositories
     {
         Task<IEnumerable<Flight>> GetAllAsync();
         Task<Flight> GetByIdAsync(int id);
-        Task AddAsync(Flight flight);
+        Task<IEnumerable<Flight>> GetByIdsAsync(List<int> ids);
         Task<IEnumerable<Flight>> GetFlightsByLocationDestinationAsync(int locationId);
+        Task AddAsync(Flight flight);
+        Task UpdateAsync(Flight flight);
+        Task DeleteAsync(Flight flight);
     }
 }

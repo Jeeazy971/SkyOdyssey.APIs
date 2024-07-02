@@ -43,14 +43,14 @@ namespace SkyOdyssey.Controllers
             StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
             if (string.IsNullOrEmpty(StripeConfiguration.ApiKey))
             {
-                return StatusCode(500, "Stripe API key is not configured");
+                return StatusCode(500, "La clé API Stripe n'est pas configurée");
             }
 
             var options = new ChargeCreateOptions
             {
                 Amount = (long)(paymentDto.Amount * 100), // Montant en centimes
                 Currency = paymentDto.Currency,
-                Description = $"Payment for reservation {paymentDto.ReservationId}",
+                Description = $"Paiement de la réservation {paymentDto.ReservationId}",
                 Source = paymentDto.Token
             };
 
@@ -62,7 +62,7 @@ namespace SkyOdyssey.Controllers
             }
             catch (StripeException ex)
             {
-                return StatusCode(500, $"Stripe error: {ex.Message}");
+                return StatusCode(500, $"Erreur de Stripe : {ex.Message}");
             }
 
             if (charge.Status == "succeeded")
@@ -73,9 +73,7 @@ namespace SkyOdyssey.Controllers
                     EndDate = reservation.EndDate,
                     NumberOfGuests = reservation.NumberOfGuests,
                     TotalPrice = reservation.TotalPrice,
-                    Status = "Paid",
-                    Flights = reservation.Flights,
-                    Location = reservation.Locations
+                    Status = "Payé",
                 };
 
                 await _reservationService.UpdateReservationAsync(reservation.Id, updateReservationDto);

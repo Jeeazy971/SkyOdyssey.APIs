@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SkyOdyssey.DTOs;
 using SkyOdyssey.Services;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 [ApiController]
@@ -25,7 +24,7 @@ public class ReservationsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Internal server error: " + ex.Message);
+            return StatusCode(500, "Erreur interne du serveur : " + ex.Message);
         }
     }
 
@@ -43,7 +42,7 @@ public class ReservationsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Internal server error: " + ex.Message);
+            return StatusCode(500, "Erreur interne du serveur : " + ex.Message);
         }
     }
 
@@ -62,7 +61,7 @@ public class ReservationsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Internal server error: " + ex.Message);
+            return StatusCode(500, "Erreur interne du serveur : " + ex.Message);
         }
     }
 
@@ -79,9 +78,13 @@ public class ReservationsController : ControllerBase
             await _reservationService.UpdateReservationAsync(id, updateReservationDto);
             return NoContent();
         }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
         catch (Exception ex)
         {
-            return StatusCode(500, "Internal server error: " + ex.Message);
+            return StatusCode(500, "Erreur interne du serveur : " + ex.Message);
         }
     }
 
@@ -95,7 +98,7 @@ public class ReservationsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Internal server error: " + ex.Message);
+            return StatusCode(500, "Erreur interne du serveur : " + ex.Message);
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using SkyOdyssey.Data;
+using SkyOdyssey.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using SkyOdyssey.Data;
-using SkyOdyssey.Models;
 
 namespace SkyOdyssey.Repositories
 {
@@ -27,35 +27,18 @@ namespace SkyOdyssey.Repositories
             return await _context.Locations.FindAsync(id);
         }
 
-        public async Task AddAsync(Location location)
+        public async Task<IEnumerable<Location>> GetByIdsAsync(List<int> ids)
         {
-            await _context.Locations.AddAsync(location);
-            await _context.SaveChangesAsync();
+            return await _context.Locations.Where(l => ids.Contains(l.Id)).ToListAsync();
         }
 
-        public async Task UpdateAsync(Location location)
-        {
-            _context.Locations.Update(location);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            var location = await GetByIdAsync(id);
-            if (location != null)
-            {
-                _context.Locations.Remove(location);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async Task<IEnumerable<Location>> SearchAsync(string searchTerm, DateTime? availableFrom, DateTime? availableTo, decimal? maxPrice, int? maxGuests)
+        public async Task<IEnumerable<Location>> SearchAsync(string city, DateTime? availableFrom, DateTime? availableTo, decimal? price, int? maxGuests)
         {
             var query = _context.Locations.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
+            if (!string.IsNullOrEmpty(city))
             {
-                query = query.Where(l => l.Name.Contains(searchTerm) || l.Description.Contains(searchTerm) || l.City.Contains(searchTerm));
+                query = query.Where(l => l.City.Contains(city));
             }
 
             if (availableFrom.HasValue)
@@ -68,9 +51,9 @@ namespace SkyOdyssey.Repositories
                 query = query.Where(l => l.AvailableTo <= availableTo.Value);
             }
 
-            if (maxPrice.HasValue)
+            if (price.HasValue)
             {
-                query = query.Where(l => l.Price <= maxPrice.Value);
+                query = query.Where(l => l.Price <= price.Value);
             }
 
             if (maxGuests.HasValue)
@@ -79,6 +62,34 @@ namespace SkyOdyssey.Repositories
             }
 
             return await query.ToListAsync();
+        }
+
+        public async Task AddAsync(Location location)
+        {
+            await _context.Locations.AddAsync(location);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Location location)
+        {
+            _context.Locations.Update(location);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Location location)
+        {
+            _context.Locations.Remove(location);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var location = await _context.Locations.FindAsync(id);
+            if (location != null)
+            {
+                _context.Locations.Remove(location);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

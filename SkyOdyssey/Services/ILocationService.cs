@@ -10,5 +10,6 @@ namespace SkyOdyssey.Services
         Task UpdateLocationAsync(int id, LocationDto locationDto);
         Task DeleteLocationAsync(int id);
         Task<IEnumerable<LocationDto>> SearchLocationsAsync(string searchTerm, DateTime? availableFrom, DateTime? availableTo, decimal? maxPrice, int? maxGuests);
+        Task<IEnumerable<LocationDto>> GetAvailableLocationsAsync();
     }
 }

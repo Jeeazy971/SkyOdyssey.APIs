@@ -41,5 +41,11 @@ namespace SkyOdyssey.Services
             var flights = await _flightRepository.GetFlightsByLocationDestinationAsync(locationId);
             return _mapper.Map<IEnumerable<FlightDto>>(flights);
         }
+
+        public async Task<IEnumerable<FlightDto>> GetAvailableFlightsAsync()
+        {
+            var flights = await _flightRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<FlightDto>>(flights);
+        }
     }
 }

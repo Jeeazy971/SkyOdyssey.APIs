@@ -1,8 +1,9 @@
-﻿using SkyOdyssey.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SkyOdyssey.Data;
 using SkyOdyssey.Models;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace SkyOdyssey.Repositories
 {
@@ -17,12 +18,22 @@ namespace SkyOdyssey.Repositories
 
         public async Task<IEnumerable<Flight>> GetAllAsync()
         {
-            return await _context.Flights.Include(f => f.Reservation).Include(f => f.Location).ToListAsync();
+            return await _context.Flights.ToListAsync();
         }
 
         public async Task<Flight> GetByIdAsync(int id)
         {
-            return await _context.Flights.Include(f => f.Reservation).Include(f => f.Location).SingleOrDefaultAsync(f => f.Id == id);
+            return await _context.Flights.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<Flight>> GetByIdsAsync(List<int> ids)
+        {
+            return await _context.Flights.Where(f => ids.Contains(f.Id)).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Flight>> GetFlightsByLocationDestinationAsync(int locationId)
+        {
+            return await _context.Flights.Where(f => f.LocationId == locationId).ToListAsync();
         }
 
         public async Task AddAsync(Flight flight)
@@ -31,11 +42,16 @@ namespace SkyOdyssey.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Flight>> GetFlightsByLocationDestinationAsync(int locationId)
+        public async Task UpdateAsync(Flight flight)
         {
-            return await _context.Flights
-                .Where(f => f.LocationId == locationId)
-                .ToListAsync();
+            _context.Flights.Update(flight);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Flight flight)
+        {
+            _context.Flights.Remove(flight);
+            await _context.SaveChangesAsync();
         }
     }
 }

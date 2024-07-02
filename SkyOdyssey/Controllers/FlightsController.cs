@@ -49,5 +49,12 @@ namespace SkyOdyssey.Controllers
             var flights = await _flightService.GetFlightsByLocationDestinationAsync(locationId);
             return Ok(flights);
         }
+
+        [HttpGet("available")]
+        public async Task<ActionResult<IEnumerable<FlightDto>>> GetAvailableFlights()
+        {
+            var flights = await _flightService.GetAvailableFlightsAsync();
+            return Ok(flights);
+        }
     }
 }

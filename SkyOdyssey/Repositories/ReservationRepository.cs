@@ -19,7 +19,7 @@ namespace SkyOdyssey.Repositories
         {
             return await _context.Reservations
                 .Include(r => r.Flights)
-                .Include(r => r.Locations) // Include Locations
+                .Include(r => r.Locations)
                 .ToListAsync();
         }
 
@@ -27,7 +27,7 @@ namespace SkyOdyssey.Repositories
         {
             return await _context.Reservations
                 .Include(r => r.Flights)
-                .Include(r => r.Locations) // Include Locations
+                .Include(r => r.Locations)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 

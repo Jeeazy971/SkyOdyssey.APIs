@@ -21,7 +21,7 @@ namespace SkyOdyssey.Controllers
         {
             var user = await _userService.Register(registerUserDto);
             if (user == null)
-                return BadRequest("Username is already taken.");
+                return BadRequest("Le nom d'utilisateur est déjà pris.");
 
             return Ok(user);
         }

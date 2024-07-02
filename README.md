@@ -1,935 +1,402 @@
-# Documentation de l'API SkyOdyssey
+### Documentation de l'API SkyOdyssey
 
-## Introduction
-SkyOdyssey est une API de réservation de voyages qui permet aux utilisateurs de rechercher des hôtels, de réserver des vols et des hôtels, et de gérer leurs réservations. Cette documentation couvre tous les endpoints disponibles dans l'API et comment les utiliser côté front avec Angular/Ionic.
+---
 
-## Configuration de l'API
+### À quoi sert l'API
 
-### CORS
-Pour permettre à l'API d'accepter des requêtes provenant de n'importe quelle origine, assurez-vous que le middleware CORS est correctement configuré dans `Program.cs`.
+L'API SkyOdyssey est conçue pour gérer les réservations de voyages incluant des vols et des hébergements. Elle permet aux utilisateurs de créer, lire, mettre à jour et supprimer des réservations. De plus, elle facilite la gestion des utilisateurs, des vols et des locations.
 
-```csharp
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll",
-        builder =>
+### Comment utiliser l'API
+
+Pour utiliser l'API SkyOdyssey, vous devez d'abord vous authentifier en tant qu'utilisateur. Une fois authentifié, vous pouvez accéder aux différentes fonctionnalités de l'API via les endpoints décrits ci-dessous.
+
+### L'architecture du projet
+
+L'architecture du projet suit le modèle classique de séparation des préoccupations avec les couches suivantes :
+- **Controllers** : Gestion des requêtes HTTP et des réponses.
+- **Services** : Logique métier.
+- **Repositories** : Accès aux données.
+- **Models** : Modèles de données.
+- **DTOs (Data Transfer Objects)** : Objets utilisés pour transférer des données entre les couches.
+
+### Endpoints de l'API
+
+Voici une liste détaillée des endpoints disponibles dans l'API SkyOdyssey :
+
+#### Utilisateurs
+
+- **Register User**
+  - **URL** : `/api/Users/register`
+  - **Méthode** : `POST`
+  - **Description** : Enregistre un nouvel utilisateur.
+  - **Body** : 
+    ```json
+    {
+      "username": "string",
+      "email": "string",
+      "password": "string"
+    }
+    ```
+  - **Response** : 
+    ```json
+    {
+      "id": 0,
+      "username": "string",
+      "email": "string",
+      "token": "string"
+    }
+    ```
+
+- **Authenticate User**
+  - **URL** : `/api/Users/authenticate`
+  - **Méthode** : `POST`
+  - **Description** : Authentifie un utilisateur.
+  - **Body** : 
+    ```json
+    {
+      "email": "string",
+      "password": "string"
+    }
+    ```
+  - **Response** : 
+    ```json
+    {
+      "id": 0,
+      "username": "string",
+      "email": "string",
+      "token": "string"
+    }
+    ```
+
+#### Réservations
+
+- **Get All Reservations**
+  - **URL** : `/api/Reservations`
+  - **Méthode** : `GET`
+  - **Description** : Récupère toutes les réservations.
+  - **Response** : 
+    ```json
+    [
+      {
+        "id": 0,
+        "startDate": "2024-07-01T21:58:33.783Z",
+        "endDate": "2024-07-01T21:58:33.783Z",
+        "numberOfGuests": 0,
+        "totalPrice": 0,
+        "userId": 0,
+        "flights": [
+          {
+            "id": 0,
+            "flightNumber": "string",
+            "departureAirport": "string",
+            "arrivalAirport": "string",
+            "departureTime": "2024-07-01T21:58:33.783Z",
+            "arrivalTime": "2024-07-01T21:58:33.783Z",
+            "price": 0,
+            "airline": "string"
+          }
+        ],
+        "locations": [
+          {
+            "id": 0,
+            "name": "string",
+            "description": "string",
+            "availableFrom": "2024-07-01T21:58:33.783Z",
+            "availableTo": "2024-07-01T21:58:33.783Z",
+            "maxGuests": 0,
+            "includesTransport": true,
+            "price": 0,
+            "city": "string",
+            "imagePath": "string"
+          }
+        ]
+      }
+    ]
+    ```
+
+- **Get Reservation By ID**
+  - **URL** : `/api/Reservations/{id}`
+  - **Méthode** : `GET`
+  - **Description** : Récupère une réservation par ID.
+  - **Response** : 
+    ```json
+    {
+      "id": 0,
+      "startDate": "2024-07-01T21:58:33.783Z",
+      "endDate": "2024-07-01T21:58:33.783Z",
+      "numberOfGuests": 0,
+      "totalPrice": 0,
+      "userId": 0,
+      "flights": [
         {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
-        });
-});
-```
-
-## Endpoints de l'API
-
-### Utilisateurs
-
-#### Enregistrer un utilisateur
-```
-POST /api/users/register
-```
-**Description :** Enregistre un nouvel utilisateur.
-
-**Exemple de requête :**
-```json
-{
-  "username": "john_doe",
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-**Réponse :**
-```json
-{
-  "id": 1,
-  "username": "john_doe",
-  "email": "john@example.com"
-}
-```
-
-#### Authentifier un utilisateur
-```
-POST /api/users/login
-```
-**Description :** Authentifie un utilisateur et renvoie un jeton JWT.
-
-**Exemple de requête :**
-```json
-{
-  "username": "john_doe",
-  "password": "password123"
-}
-```
-
-**Réponse :**
-```json
-{
-  "token": "jwt-token-string"
-}
-```
-
-#### Récupérer tous les utilisateurs
-```
-GET /api/users
-```
-**Description :** Récupère la liste de tous les utilisateurs.
-
-**Réponse :**
-```json
-[
-  {
-    "id": 1,
-    "username": "john_doe",
-    "email": "john@example.com"
-  }
-]
-```
-
-#### Récupérer un utilisateur par ID
-```
-GET /api/users/{id}
-```
-**Description :** Récupère un utilisateur par son ID.
-
-**Réponse :**
-```json
-{
-  "id": 1,
-  "username": "john_doe",
-  "email": "john@example.com"
-}
-```
-
-### Locations (Hôtels)
-
-#### Récupérer toutes les locations
-```
-GET /api/locations
-```
-**Description :** Récupère la liste de toutes les locations.
-
-**Réponse :**
-```json
-[
-  {
-    "id": 1,
-    "name": "Paris Hotel",
-    "description": "Profitez de notre hôtel Paris Hotel situé au cœur de Paris...",
-    "availableFrom": "2023-01-01T00:00:00",
-    "availableTo": "2023-12-31T23:59:59",
-    "maxGuests": 4,
-    "includesTransport": true,
-    "price": 150.00,
-    "city": "Paris",
-    "imagePath": "uploads/abc123.jpg"
-  }
-]
-```
-
-#### Récupérer une location par ID
-```
-GET /api/locations/{id}
-```
-**Description :** Récupère une location par son ID.
-
-**Réponse :**
-```json
-{
-  "id": 1,
-  "name": "Paris Hotel",
-  "description": "Profitez de notre hôtel Paris Hotel situé au cœur de Paris...",
-  "availableFrom": "2023-01-01T00:00:00",
-  "availableTo": "2023-12-31T23:59:59",
-  "maxGuests": 4,
-  "includesTransport": true,
-  "price": 150.00,
-  "city": "Paris",
-  "imagePath": "uploads/abc123.jpg"
-}
-```
-
-#### Créer une location
-```
-POST /api/locations
-```
-**Description :** Crée une nouvelle location.
-
-**Exemple de requête :**
-```json
-{
-  "name": "Paris Hotel",
-  "description": "Profitez de notre hôtel Paris Hotel situé au cœur de Paris...",
-  "availableFrom": "2023-01-01T00:00:00",
-  "availableTo": "2023-12-31T23:59:59",
-  "maxGuests": 4,
-  "includesTransport": true,
-  "price": 150.00,
-  "city": "Paris",
-  "image": "image-file"
-}
-```
-
-**Réponse :**
-```json
-{
-  "id": 1,
-  "name": "Paris Hotel",
-  "description": "Profitez de notre hôtel Paris Hotel situé au cœur de Paris...",
-  "availableFrom": "2023-01-01T00:00:00",
-  "availableTo": "2023-12-31T23:59:59",
-  "maxGuests": 4,
-  "includesTransport": true,
-  "price": 150.00,
-  "city": "Paris",
-  "imagePath": "uploads/abc123.jpg"
-}
-```
-
-#### Mettre à jour une location
-```
-PUT /api/locations/{id}
-```
-**Description :** Met à jour une location existante.
-
-**Exemple de requête :**
-```json
-{
-  "name": "Updated Paris Hotel",
-  "description": "Profitez de notre hôtel Paris Hotel situé au cœur de Paris...",
-  "availableFrom": "2023-01-01T00:00:00",
-  "availableTo": "2023-12-31T23:59:59",
-  "maxGuests": 4,
-  "includesTransport": true,
-  "price": 150.00,
-  "city": "Paris",
-  "imagePath": "uploads/abc123.jpg"
-}
-```
-
-**Réponse :**
-```json
-{}
-```
-
-#### Supprimer une location
-```
-DELETE /api/locations/{id}
-```
-**Description :** Supprime une location par son ID.
-
-**Réponse :**
-```json
-{}
-```
-
-#### Rechercher des locations
-```
-GET /api/locations/search
-```
-**Description :** Recherche des locations basées sur différents critères.
-
-**Exemple de requête :**
-```
-GET /api/locations/search?searchTerm=Paris&availableFrom=2023-01-01&availableTo=2023-12-31&maxPrice=200&maxGuests=4
-```
-
-**Réponse :**
-```json
-[
-  {
-    "id": 1,
-    "name": "Paris Hotel",
-    "description": "Profitez de notre hôtel Paris Hotel situé au cœur de Paris...",
-    "availableFrom": "2023-01-01T00:00:00",
-    "availableTo": "2023-12-31T23:59:59",
-    "maxGuests": 4,
-    "includesTransport": true,
-    "price": 150.00,
-    "city": "Paris",
-    "imagePath": "uploads/abc123.jpg"
-  }
-]
-```
-
-### Réservations
-
-#### Récupérer toutes les réservations
-```
-GET /api/reservations
-```
-**Description :** Récupère la liste de toutes les réservations.
-
-**Réponse :**
-```json
-[
-  {
-    "id": 1,
-    "startDate": "2023-06-01T00:00:00",
-    "endDate": "2023-06-10T00:00:00",
-    "numberOfGuests": 2,
-    "totalPrice": 300.00,
-    "userId": 1,
-    "locationId": 1,
-    "status": "Pending",
-    "flights": [],
-    "hotels": []
-  }
-]
-```
-
-#### Récupérer une réservation par ID
-```
-GET /api/reservations/{id}
-```
-**Description :** Récupère une réservation par son ID.
-
-**Réponse :**
-```json
-{
-  "id": 1,
-  "startDate": "2023-06-01T00:00:00",
-    "endDate": "2023-06-10T00:00:00",
-    "numberOfGuests": 2,
-    "totalPrice": 300.00,
-    "userId": 1,
-    "locationId": 1,
-    "status": "Pending",
-    "flights": [],
-    "hotels": []
-}
-```
-
-#### Créer une réservation
-```
-POST /api/reservations
-```
-**Description :** Crée une nouvelle réservation.
-
-**Exemple de requête :**
-```json
-{
-  "startDate": "2023-06-01T00:00:00",
-  "endDate": "2023-06-10T00:00:00",
-  "numberOfGuests": 2,
-  "totalPrice": 300.00,
-  "userId": 1,
-  "locationId": 1,
-  "flights": [],
-  "hotels": []
-}
-```
-
-**Réponse :**
-```json
-{
-  "id": 1,
-  "startDate": "2023-06-01T00:00:00",
-    "endDate": "2023-06-10T00:00:00",
-    "numberOfGuests": 2,
-    "totalPrice": 300.00,
-    "userId": 1
-
-,
-    "locationId": 1,
-    "status": "Pending",
-    "flights": [],
-    "hotels": []
-}
-```
-
-#### Mettre à jour une réservation
-```
-PUT /api/reservations/{id}
-```
-**Description :** Met à jour une réservation existante.
-
-**Exemple de requête :**
-```json
-{
-  "startDate": "2023-06-01T00:00:00",
-  "endDate": "2023-06-10T00:00:00",
-  "numberOfGuests": 2,
-  "totalPrice": 300.00,
-  "userId": 1,
-  "locationId": 1,
-  "status": "Confirmed",
-  "flights": [],
-  "hotels": []
-}
-```
-
-**Réponse :**
-```json
-{}
-```
-
-#### Supprimer une réservation
-```
-DELETE /api/reservations/{id}
-```
-**Description :** Supprime une réservation par son ID.
-
-**Réponse :**
-```json
-{}
-```
-
-### Vols
-
-#### Récupérer tous les vols
-```
-GET /api/flights
-```
-**Description :** Récupère la liste de tous les vols.
-
-**Réponse :**
-```json
-[
-  {
-    "id": 1,
-    "flightNumber": "AF123",
-    "departureAirport": "Paris Charles de Gaulle",
-    "arrivalAirport": "New York JFK",
-    "departureTime": "2023-06-01T10:00:00",
-    "arrivalTime": "2023-06-01T13:00:00",
-    "price": 500.00,
-    "airline": "Air France",
-    "reservationId": 1,
-    "locationId": 1
-  }
-]
-```
-
-#### Récupérer un vol par ID
-```
-GET /api/flights/{id}
-```
-**Description :** Récupère un vol par son ID.
-
-**Réponse :**
-```json
-{
-  "id": 1,
-  "flightNumber": "AF123",
-  "departureAirport": "Paris Charles de Gaulle",
-  "arrivalAirport": "New York JFK",
-  "departureTime": "2023-06-01T10:00:00",
-  "arrivalTime": "2023-06-01T13:00:00",
-  "price": 500.00,
-  "airline": "Air France",
-  "reservationId": 1,
-  "locationId": 1
-}
-```
-
-#### Créer un vol
-```
-POST /api/flights
-```
-**Description :** Crée un nouveau vol.
-
-**Exemple de requête :**
-```json
-{
-  "flightNumber": "AF123",
-  "departureAirport": "Paris Charles de Gaulle",
-  "arrivalAirport": "New York JFK",
-  "departureTime": "2023-06-01T10:00:00",
-  "arrivalTime": "2023-06-01T13:00:00",
-  "price": 500.00,
-  "airline": "Air France",
-  "reservationId": 1,
-  "locationId": 1
-}
-```
-
-**Réponse :**
-```json
-{
-  "id": 1,
-  "flightNumber": "AF123",
-  "departureAirport": "Paris Charles de Gaulle",
-  "arrivalAirport": "New York JFK",
-  "departureTime": "2023-06-01T10:00:00",
-  "arrivalTime": "2023-06-01T13:00:00",
-  "price": 500.00,
-  "airline": "Air France",
-  "reservationId": 1,
-  "locationId": 1
-}
-```
-
-#### Mettre à jour un vol
-```
-PUT /api/flights/{id}
-```
-**Description :** Met à jour un vol existant.
-
-**Exemple de requête :**
-```json
-{
-  "flightNumber": "AF123",
-  "departureAirport": "Paris Charles de Gaulle",
-  "arrivalAirport": "New York JFK",
-  "departureTime": "2023-06-01T10:00:00",
-  "arrivalTime": "2023-06-01T13:00:00",
-  "price": 500.00,
-  "airline": "Air France",
-  "reservationId": 1,
-  "locationId": 1
-}
-```
-
-**Réponse :**
-```json
-{}
-```
-
-#### Supprimer un vol
-```
-DELETE /api/flights/{id}
-```
-**Description :** Supprime un vol par son ID.
-
-**Réponse :**
-```json
-{}
-```
-
-#### Récupérer les vols par location
-```
-GET /api/flights/by-location/{locationId}
-```
-**Description :** Récupère les vols disponibles pour une location donnée.
-
-**Réponse :**
-```json
-[
-  {
-    "id": 1,
-    "flightNumber": "AF123",
-    "departureAirport": "Paris Charles de Gaulle",
-    "arrivalAirport": "New York JFK",
-    "departureTime": "2023-06-01T10:00:00",
-    "arrivalTime": "2023-06-01T13:00:00",
-    "price": 500.00,
-    "airline": "Air France",
-    "reservationId": 1,
-    "locationId": 1
-  }
-]
-```
-
-### Hôtels
-
-#### Récupérer tous les hôtels
-```
-GET /api/hotels
-```
-**Description :** Récupère la liste de tous les hôtels.
-
-**Réponse :**
-```json
-[
-  {
-    "id": 1,
-    "name": "Hotel Paris",
-    "location": "Paris",
-    "pricePerNight": 100.00,
-    "reservationId": 1
-  }
-]
-```
-
-#### Récupérer un hôtel par ID
-```
-GET /api/hotels/{id}
-```
-**Description :** Récupère un hôtel par son ID.
-
-**Réponse :**
-```json
-{
-  "id": 1,
-  "name": "Hotel Paris",
-  "location": "Paris",
-  "pricePerNight": 100.00,
-  "reservationId": 1
-}
-```
-
-#### Créer un hôtel
-```
-POST /api/hotels
-```
-**Description :** Crée un nouvel hôtel.
-
-**Exemple de requête :**
-```json
-{
-  "name": "Hotel Paris",
-  "location": "Paris",
-  "pricePerNight": 100.00,
-  "reservationId": 1
-}
-```
-
-**Réponse :**
-```json
-{
-  "id": 1,
-  "name": "Hotel Paris",
-  "location": "Paris",
-  "pricePerNight": 100.00,
-  "reservationId": 1
-}
-```
-
-#### Mettre à jour un hôtel
-```
-PUT /api/hotels/{id}
-```
-**Description :** Met à jour un hôtel existant.
-
-**Exemple de requête :**
-```json
-{
-  "name": "Updated Hotel Paris",
-  "location": "Paris",
-  "pricePerNight": 120.00,
-  "reservationId": 1
-}
-```
-
-**Réponse :**
-```json
-{}
-```
-
-#### Supprimer un hôtel
-```
-DELETE /api/hotels/{id}
-```
-**Description :** Supprime un hôtel par son ID.
-
-**Réponse :**
-```json
-{}
-```
-
-### Paiements
-
-#### Effectuer un paiement
-```
-POST /api/payments/{reservationId}/pay
-```
-**Description :** Effectue un paiement pour une réservation donnée.
-
-**Exemple de requête :**
-```json
-{
-  "token": "tok_visa",
-  "amount": 500,
-  "currency": "eur",
-  "reservationId": 1
-}
-```
-
-**Réponse :**
-```json
-{
-  "status": "succeeded",
-  "paymentIntentId": "pi_1234567890"
-}
-```
-
-## Intégration avec Angular/Ionic
-
-### Configuration du service HTTP dans Angular
-
-Créez un service Angular pour interagir avec l'API.
-
+          "id": 0,
+          "flightNumber": "string",
+          "departureAirport": "string",
+          "arrivalAirport": "string",
+          "departureTime": "2024-07-01T21:58:33.783Z",
+          "arrivalTime": "2024-07-01T21:58:33.783Z",
+          "price": 0,
+          "airline": "string"
+        }
+      ],
+      "locations": [
+        {
+          "id": 0,
+          "name": "string",
+          "description": "string",
+          "availableFrom": "2024-07-01T21:58:33.783Z",
+          "availableTo": "2024-07-01T21:58:33.783Z",
+          "maxGuests": 0,
+          "includesTransport": true,
+          "price": 0,
+          "city": "string",
+          "imagePath": "string"
+        }
+      ]
+    }
+    ```
+
+- **Create Reservation**
+  - **URL** : `/api/Reservations`
+  - **Méthode** : `POST`
+  - **Description** : Crée une nouvelle réservation.
+  - **Body** : 
+    ```json
+    {
+      "startDate": "2024-07-01T21:58:33.783Z",
+      "endDate": "2024-07-01T21:58:33.783Z",
+      "numberOfGuests": 2,
+      "totalPrice": 500,
+      "userId": 1,
+      "locationIds": [1],
+      "flightIds": [1]
+    }
+    ```
+  - **Response** : `201 Created`
+
+- **Update Reservation**
+  - **URL** : `/api/Reservations/{id}`
+  - **Méthode** : `PUT`
+  - **Description** : Met à jour une réservation existante.
+  - **Body** : 
+    ```json
+    {
+      "id": 1,
+      "startDate": "2024-07-01T21:58:33.783Z",
+      "endDate": "2024-07-01T21:58:33.783Z",
+      "numberOfGuests": 2,
+      "totalPrice": 500,
+      "userId": 1,
+      "locationIds": [1],
+      "flightIds": [1]
+    }
+    ```
+  - **Response** : `204 No Content`
+
+- **Delete Reservation**
+  - **URL** : `/api/Reservations/{id}`
+  - **Méthode** : `DELETE`
+  - **Description** : Supprime une réservation par ID.
+  - **Response** : `204 No Content`
+
+#### Vols
+
+- **Get All Flights**
+  - **URL** : `/api/Flights`
+  - **Méthode** : `GET`
+  - **Description** : Récupère tous les vols.
+  - **Response** : 
+    ```json
+    [
+      {
+        "id": 0,
+        "flightNumber": "string",
+        "departureAirport": "string",
+        "arrivalAirport": "string",
+        "departureTime": "2024-07-01T21:58:33.783Z",
+        "arrivalTime": "2024-07-01T21:58:33.783Z",
+        "price": 0,
+        "airline": "string"
+      }
+    ]
+    ```
+
+- **Get Available Flights**
+  - **URL** : `/api/Flights/available`
+  - **Méthode** : `GET`
+  - **Description** : Récupère les vols disponibles.
+  - **Response** : 
+    ```json
+    [
+      {
+        "id": 0,
+        "flightNumber": "string",
+        "departureAirport": "string",
+        "arrivalAirport": "string",
+        "departureTime": "2024-07-01T21:58:33.783Z",
+        "arrivalTime": "2024-07-01T21:58:33.783Z",
+        "price": 0,
+        "airline": "string"
+      }
+    ]
+    ```
+
+#### Locations
+
+- **Get All Locations**
+  - **URL** : `/api/Locations`
+  - **Méthode** : `GET`
+  - **Description** : Récupère toutes les locations.
+  - **Response** : 
+    ```json
+    [
+      {
+        "id": 0,
+        "name": "string",
+        "description": "string",
+        "availableFrom": "2024-07-01T21:58:33.783Z",
+        "availableTo": "2024-07-01T21:58:33.783Z",
+        "maxGuests": 0,
+        "includesTransport": true,
+        "price": 0,
+        "city": "string",
+        "imagePath":
+
+ "string"
+      }
+    ]
+    ```
+
+- **Get Available Locations**
+  - **URL** : `/api/Locations/available`
+  - **Méthode** : `GET`
+  - **Description** : Récupère les locations disponibles.
+  - **Response** : 
+    ```json
+    [
+      {
+        "id": 0,
+        "name": "string",
+        "description": "string",
+        "availableFrom": "2024-07-01T21:58:33.783Z",
+        "availableTo": "2024-07-01T21:58:33.783Z",
+        "maxGuests": 0,
+        "includesTransport": true,
+        "price": 0,
+        "city": "string",
+        "imagePath": "string"
+      }
+    ]
+    ```
+
+### Fonctionnalités de l'API
+
+- Gestion des utilisateurs (inscription, authentification).
+- Gestion des réservations (CRUD).
+- Gestion des vols (récupération des vols disponibles).
+- Gestion des locations (récupération des locations disponibles).
+- Paiement des réservations.
+
+### Utilisation des Endpoints côté Front avec Ionic/Angular
+
+Pour interagir avec l'API depuis une application Ionic/Angular, voici un exemple de service Angular pour gérer les réservations :
+
+**reservation.service.ts** :
 ```typescript
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { User, Location, Reservation, Flight, Hotel, Payment } from './models'; // Importez les modèles appropriés
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ApiService {
-  private apiUrl = 'https://localhost:32768/api';
+export class ReservationService {
+  private apiUrl = `${environment.apiUrl}/api/Reservations`;
 
   constructor(private http: HttpClient) { }
 
-  // Utilisateurs
-  registerUser(user: User): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/users/register`, user);
+  getReservations(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl);
   }
 
-  loginUser(user: { username: string, password: string }): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/users/login`, user);
+  getReservationById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
 
-  getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/users`);
+  createReservation(reservation: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, reservation);
   }
 
-  getUserById(id: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/users/${id}`);
-  }
-
-  // Locations
-  getLocations(): Observable<Location[]> {
-    return this.http.get<Location[]>(`${this.apiUrl}/locations`);
-  }
-
-  getLocationById(id: number): Observable<Location>
-
- {
-    return this.http.get<Location>(`${this.apiUrl}/locations/${id}`);
-  }
-
-  createLocation(location: FormData): Observable<Location> {
-    return this.http.post<Location>(`${this.apiUrl}/locations`, location);
-  }
-
-  updateLocation(id: number, location: Location): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/locations/${id}`, location);
-  }
-
-  deleteLocation(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/locations/${id}`);
-  }
-
-  searchLocations(searchTerm: string, availableFrom?: Date, availableTo?: Date, maxPrice?: number, maxGuests?: number): Observable<Location[]> {
-    let params = `?searchTerm=${searchTerm}`;
-    if (availableFrom) params += `&availableFrom=${availableFrom.toISOString()}`;
-    if (availableTo) params += `&availableTo=${availableTo.toISOString()}`;
-    if (maxPrice) params += `&maxPrice=${maxPrice}`;
-    if (maxGuests) params += `&maxGuests=${maxGuests}`;
-    return this.http.get<Location[]>(`${this.apiUrl}/locations/search${params}`);
-  }
-
-  // Réservations
-  getReservations(): Observable<Reservation[]> {
-    return this.http.get<Reservation[]>(`${this.apiUrl}/reservations`);
-  }
-
-  getReservationById(id: number): Observable<Reservation> {
-    return this.http.get<Reservation>(`${this.apiUrl}/reservations/${id}`);
-  }
-
-  createReservation(reservation: Reservation): Observable<Reservation> {
-    return this.http.post<Reservation>(`${this.apiUrl}/reservations`, reservation);
-  }
-
-  updateReservation(id: number, reservation: Reservation): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/reservations/${id}`, reservation);
+  updateReservation(id: number, reservation: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, reservation);
   }
 
   deleteReservation(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/reservations/${id}`);
-  }
-
-  // Vols
-  getFlights(): Observable<Flight[]> {
-    return this.http.get<Flight[]>(`${this.apiUrl}/flights`);
-  }
-
-  getFlightById(id: number): Observable<Flight> {
-    return this.http.get<Flight>(`${this.apiUrl}/flights/${id}`);
-  }
-
-  createFlight(flight: Flight): Observable<Flight> {
-    return this.http.post<Flight>(`${this.apiUrl}/flights`, flight);
-  }
-
-  updateFlight(id: number, flight: Flight): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/flights/${id}`, flight);
-  }
-
-  deleteFlight(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/flights/${id}`);
-  }
-
-  getFlightsByLocation(locationId: number): Observable<Flight[]> {
-    return this.http.get<Flight[]>(`${this.apiUrl}/flights/by-location/${locationId}`);
-  }
-
-  // Hôtels
-  getHotels(): Observable<Hotel[]> {
-    return this.http.get<Hotel[]>(`${this.apiUrl}/hotels`);
-  }
-
-  getHotelById(id: number): Observable<Hotel> {
-    return this.http.get<Hotel>(`${this.apiUrl}/hotels/${id}`);
-  }
-
-  createHotel(hotel: Hotel): Observable<Hotel> {
-    return this.http.post<Hotel>(`${this.apiUrl}/hotels`, hotel);
-  }
-
-  updateHotel(id: number, hotel: Hotel): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/hotels/${id}`, hotel);
-  }
-
-  deleteHotel(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/hotels/${id}`);
-  }
-
-  // Paiements
-  makePayment(reservationId: number, payment: Payment): Observable<{ status: string, paymentIntentId: string }> {
-    return this.http.post<{ status: string, paymentIntentId: string }>(`${this.apiUrl}/payments/${reservationId}/pay`, payment);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }
 ```
 
-### Utilisation dans un composant Angular
-
-Exemple de composant pour afficher la liste des locations :
-
+**reservation.component.ts** :
 ```typescript
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from './api.service';
-import { Location } from './models';
+import { ReservationService } from './reservation.service';
 
 @Component({
-  selector: 'app-locations',
-  templateUrl: './locations.component.html',
-  styleUrls: ['./locations.component.css']
+  selector: 'app-reservation',
+  templateUrl: './reservation.component.html',
+  styleUrls: ['./reservation.component.css']
 })
-export class LocationsComponent implements OnInit {
-  locations: Location[];
+export class ReservationComponent implements OnInit {
+  reservations: any[] = [];
+  selectedReservation: any = null;
 
-  constructor(private apiService: ApiService) { }
+  constructor(private reservationService: ReservationService) { }
 
   ngOnInit(): void {
-    this.apiService.getLocations().subscribe((data: Location[]) => {
-      this.locations = data;
-    });
+    this.loadReservations();
   }
-}
-```
 
-Exemple de composant pour créer une location avec un formulaire :
-
-```typescript
-import { Component } from '@angular/core';
-import { ApiService } from './api.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
-
-@Component({
-  selector: 'app-create-location',
-  templateUrl: './create-location.component.html',
-  styleUrls: ['./create-location.component.css']
-})
-export class CreateLocationComponent {
-  locationForm: FormGroup;
-
-  constructor(private apiService: ApiService, private fb: FormBuilder) {
-    this.locationForm = this.fb.group({
-      name: [''],
-      description: [''],
-      availableFrom: [''],
-      availableTo: [''],
-      maxGuests: [''],
-      includesTransport: [''],
-      price: [''],
-      city: [''],
-      image: [null]
+  loadReservations(): void {
+    this.reservationService.getReservations().subscribe(data => {
+      this.reservations = data;
     });
   }
 
-  onFileChange(event: any) {
-    if (event.target.files.length > 0) {
-      const file = event.target.files[0];
-      this.locationForm.patchValue({
-        image: file
+  selectReservation(id: number): void {
+    this.reservationService.getReservationById(id).subscribe(data => {
+      this.selectedReservation = data;
+    });
+  }
+
+  createReservation(): void {
+    const newReservation = {
+      startDate: new Date(),
+      endDate: new Date(),
+      numberOfGuests: 2,
+      totalPrice: 500,
+      userId: 1,
+      locationIds: [1],
+      flightIds: [1]
+    };
+    this.reservationService.createReservation(newReservation).subscribe(() => {
+      this.loadReservations();
+    });
+  }
+
+  updateReservation(): void {
+    if (this.selectedReservation) {
+      this.reservationService.updateReservation(this.selectedReservation.id, this.selectedReservation).subscribe(() => {
+        this.loadReservations();
       });
     }
   }
 
-  submit() {
-    const formData = new FormData();
-    Object.keys(this.locationForm.controls).forEach(key => {
-      formData.append(key, this.locationForm.get(key).value);
-    });
-
-    this.apiService.createLocation(formData).subscribe(response => {
-      console.log('Location created', response);
+  deleteReservation(id: number): void {
+    this.reservationService.deleteReservation(id).subscribe(() => {
+      this.loadReservations();
     });
   }
-}
-```
-
-### Modèles utilisés côté front
-
-Créez un fichier `models.ts` pour définir les interfaces des données utilisées :
-
-```typescript
-export interface User {
-  id?: number;
-  username: string;
-  email: string;
-  password?: string;
-}
-
-export interface Location {
-  id?: number;
-  name: string;
-  description: string;
-  availableFrom: Date;
-  availableTo: Date;
-  maxGuests: number;
-  includesTransport: boolean;
-  price: number;
-  city: string;
-  imagePath?: string;
-  image?: File;
-}
-
-export interface Reservation {
-  id?: number;
-  startDate: Date;
-  endDate: Date;
-  numberOfGuests: number;
-  totalPrice: number;
-  userId: number;
-  locationId: number;
-  status?: string;
-  flights?: Flight[];
-  hotels?: Hotel[];
-}
-
-export interface Flight {
-  id?: number;
-  flightNumber: string;
-  departureAirport: string;
-  arrivalAirport: string;
-  departureTime: Date;
-  arrivalTime: Date;
-  price: number;
-  airline: string;
-  reservationId: number;
-  locationId: number;
-}
-
-export interface Hotel {
-  id?: number;
-  name: string;
-  location: string;
-  pricePerNight: number;
-  reservationId: number;
-}
-
-export interface Payment {
-  token: string;
-  amount: number;
-  currency: string;
-  reservationId: number;
 }
 ```

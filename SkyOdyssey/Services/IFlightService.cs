@@ -10,5 +10,6 @@ namespace SkyOdyssey.Services
         Task<FlightDto> GetFlightByIdAsync(int id);
         Task CreateFlightAsync(FlightDto flightDto);
         Task<IEnumerable<FlightDto>> GetFlightsByLocationDestinationAsync(int locationId);
+        Task<IEnumerable<FlightDto>> GetAvailableFlightsAsync();
     }
 }

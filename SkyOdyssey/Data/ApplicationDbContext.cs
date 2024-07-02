@@ -2,13 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using SkyOdyssey.Models;
 using SkyOdyssey.Services;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SkyOdyssey.Data
 {
@@ -190,7 +185,7 @@ namespace SkyOdyssey.Data
                 .RuleFor(f => f.ArrivalTime, (f, flight) =>
                 {
                     var departureTime = flight.DepartureTime;
-                    return departureTime.AddHours(f.Random.Double(1, 12)); // Flight duration between 1 to 12 hours
+                    return departureTime.AddHours(f.Random.Double(1, 12)); // Durée du vol entre 1 et 12 heures
                 })
                 .RuleFor(f => f.Price, f => Math.Round(f.Random.Decimal(100, 1200), 2))
                 .RuleFor(f => f.Airline, f => f.PickRandom(airlines))
@@ -204,10 +199,10 @@ namespace SkyOdyssey.Data
             context.Reservations.AddRange(reservations);
             context.Flights.AddRange(flights);
 
-            // Assign Locations to Reservations
+            // Attribuer des lieux aux réservations
             foreach (var reservation in reservations)
             {
-                var assignedLocations = locations.OrderBy(x => Guid.NewGuid()).Take(2).ToList(); // Take 2 random locations for each reservation
+                var assignedLocations = locations.OrderBy(x => Guid.NewGuid()).Take(2).ToList(); 
                 reservation.Locations.AddRange(assignedLocations);
             }
 

@@ -10,7 +10,7 @@ namespace SkyOdyssey.Models
         public DateTime EndDate { get; set; }
         public int NumberOfGuests { get; set; }
         public decimal TotalPrice { get; set; }
-        public string Status { get; set; } = "Pending";
+        public string Status { get; set; } = "En attente";
 
         public int UserId { get; set; }
         public User User { get; set; }
